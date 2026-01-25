@@ -6,7 +6,7 @@ A practical workflow system for [Claude Code](https://claude.ai/code) that combi
 
 A set of conventions and templates for working effectively with Claude Code on real projects:
 
-- **`.context/` system** - Structured project documentation that Claude reads on demand
+- **`.context/` system** - Structured project documentation that Claude reads on demand (based on [andrefigueira/.context](https://github.com/andrefigueira/.context))
 - **CLAUDE.md hierarchy** - Cascading configuration from global preferences to project-specific rules
 - **GitHub slash commands** - Custom skills for issue-driven development (`/gh-start`, `/gh-done`, etc.)
 - **Session handover** - Context continuity between coding sessions
@@ -137,6 +137,10 @@ Claude Code is powerful but works better with context. Instead of explaining you
 The `.context/` system captures institutional knowledge - not just what the code does, but why decisions were made. This prevents Claude from suggesting patterns your team already rejected, or using conventions that conflict with your codebase.
 
 The GitHub workflow commands reduce friction in issue-driven development. Type `/gh-start 42` instead of manually assigning, creating branches, and remembering issue numbers.
+
+## Credits
+
+The `.context/` system is based on [andrefigueira/.context](https://github.com/andrefigueira/.context) by [Andre Figueira](https://github.com/andrefigueira). This repo extends the concept with GitHub workflow integration and multi-project patterns for Claude Code.
 
 ## License
 
