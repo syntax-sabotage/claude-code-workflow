@@ -138,6 +138,30 @@ The `.context/` system captures institutional knowledge - not just what the code
 
 The GitHub workflow commands reduce friction in issue-driven development. Type `/gh-start 42` instead of manually assigning, creating branches, and remembering issue numbers.
 
+## FLOW Methodology (Experimental)
+
+The `flow-artifacts/` directory contains a concrete implementation of the [FLOW methodology](https://flow-methodology.com) - an AI-native, post-agile approach to software development.
+
+```
+flow-artifacts/
+├── .flow/                    # Work coordination (dynamic)
+│   ├── FLOW.md               # Hub - start here
+│   ├── streams/              # Objective groupings
+│   ├── objectives/           # Individual work units
+│   ├── agents/               # Autonomy levels & handover
+│   ├── metrics/              # Throughput, cycle time
+│   └── ceremonies/           # Async rituals
+└── .claude-commands/         # /flow-* slash commands
+```
+
+Key concepts:
+- **Streams over sprints** - Related objectives flow continuously
+- **Autonomy levels** - Trust boundaries for AI agents (Level 0-3)
+- **Async ceremonies** - No mandatory meetings, event-triggered
+- **Ship when ready** - No artificial sprint boundaries
+
+See [flow-artifacts/.flow/FLOW.md](flow-artifacts/.flow/FLOW.md) for details.
+
 ## Credits
 
 The `.context/` system is based on [andrefigueira/.context](https://github.com/andrefigueira/.context) by [Andre Figueira](https://github.com/andrefigueira). This repo extends the concept with GitHub workflow integration and multi-project patterns for Claude Code.
