@@ -4,13 +4,40 @@ A practical workflow system for [Claude Code](https://claude.ai/code) that combi
 
 ## What This Is
 
-A set of conventions and templates for working effectively with Claude Code on real projects:
+A production-tested workflow system for working effectively with Claude Code on real projects:
 
 - **`.context/` system** - Structured project documentation that Claude reads on demand (based on [andrefigueira/.context](https://github.com/andrefigueira/.context))
 - **CLAUDE.md hierarchy** - Cascading configuration from global preferences to project-specific rules
-- **GitHub slash commands** - Custom skills for issue-driven development (`/gh-start`, `/gh-done`, etc.)
+- **FLOW v2** - GitHub-native AI-native workflow (milestones, issues, labels)
+- **Statusline integration** - Real-time project state in Claude Code
+- **Slash commands** - Custom skills for issue-driven development
 - **Session handover** - Context continuity between coding sessions
-- **Multi-project patterns** - Coordinate work across related codebases
+
+## What's New in v2
+
+**January 2026** - Major update based on production learnings:
+
+✨ **FLOW v2** - GitHub-native tracking (no more file-based objectives)
+- Milestones = Streams
+- Issues = Objectives
+- Labels = Status/size/autonomy
+- No merge conflicts, single source of truth
+
+✨ **Statusline integration** - See active work in Claude Code statusline:
+```
+[Sonnet] #47 Implement sync | Invoice Pro | 1 blocked | 2 PR * | 45% | $0.23
+```
+
+✨ **Specs workflow** - Interview-based requirements capture for complex features
+
+✨ **Advanced examples**:
+- Real `.context/` patterns (GitHub integration, deployment docs, specs)
+- Domain-specific commands (requirements, validation, deployment)
+- Adaptable templates for any domain
+
+✨ **Battle-tested** - Extracted from production Odoo deployment managing 60+ modules
+
+See [FLOW_V2_MIGRATION.md](FLOW_V2_MIGRATION.md) for the evolution story.
 
 ## Quick Start
 
@@ -85,21 +112,38 @@ gh label create "status/review" --color "5319E7"
 
 ```
 claude-code-workflow/
-├── README.md                    # You are here
-├── GUIDE.md                     # Full documentation
+├── README.md                         # You are here
+├── GUIDE.md                          # Full documentation
+├── FLOW_V2_MIGRATION.md              # v1 → v2 evolution guide
+├── flow-artifacts/                   # FLOW v2 implementation
+│   ├── .flow/
+│   │   ├── FLOW.md                   # Hub
+│   │   ├── statusline.sh             # Statusline integration
+│   │   ├── update-state.sh           # State updater
+│   │   └── .gitignore                # Ephemeral state
+│   └── .claude-commands/             # /flow-* commands
 └── templates/
-    ├── global-claude-md.md      # Add to ~/.claude/CLAUDE.md
-    ├── .context/                # Copy to your project
-    │   ├── substrate.md         # Project overview
-    │   ├── ai-rules.md          # Coding constraints
-    │   ├── anti-patterns.md     # What NOT to do
-    │   ├── glossary.md          # Domain terms
-    │   └── SESSION_HANDOVER.md  # Session state
-    └── .claude-commands/        # Copy to .claude/commands/
-        ├── gh-status.md         # Overview command
-        ├── gh-start.md          # Start issue command
-        ├── gh-done.md           # Create PR command
-        └── gh-bug.md            # Report bug command
+    ├── global-claude-md.md           # Add to ~/.claude/CLAUDE.md
+    ├── .context/                     # Basic .context templates
+    │   ├── substrate.md
+    │   ├── ai-rules.md
+    │   ├── anti-patterns.md
+    │   ├── glossary.md
+    │   └── SESSION_HANDOVER.md
+    ├── .context-examples/            # Advanced patterns (NEW)
+    │   ├── README.md                 # How to use examples
+    │   ├── github.md                 # GitHub integration
+    │   └── specs-README.md           # Requirements workflow
+    ├── .claude-commands/             # Basic GitHub commands
+    │   ├── gh-status.md
+    │   ├── gh-start.md
+    │   ├── gh-done.md
+    │   └── gh-bug.md
+    └── .claude-commands-examples/    # Domain commands (NEW)
+        ├── README.md                 # How to adapt
+        ├── odoo-spec.md              # Requirements interview
+        ├── odoo-validate.md          # Module validation
+        └── vps-upgrade.md            # Deployment command
 ```
 
 ## The Five Core Files
@@ -114,12 +158,37 @@ claude-code-workflow/
 
 ## Slash Commands
 
+### GitHub Commands (Basic)
+
 | Command | What It Does |
 |---------|--------------|
 | `/gh-status` | Show issues, PRs, current branch |
 | `/gh-start <N>` | Assign issue N, create feature branch |
 | `/gh-done` | Push changes and create PR |
 | `/gh-bug` | Create bug issue from conversation |
+
+### FLOW Commands (Advanced)
+
+| Command | What It Does |
+|---------|--------------|
+| `/flow-status` | Query all milestones + issues via `gh` |
+| `/flow-start <N>` | Claim issue, create branch, update statusline |
+| `/flow-ship` | PR + merge + close issue + deploy |
+| `/flow-resume` | Start session, query current state |
+| `/flow-handover` | End session summary |
+| `/flow-reflect <stream>` | Synthesize learnings → `.context/` |
+
+### Domain-Specific Commands (Examples)
+
+See [templates/.claude-commands-examples/](templates/.claude-commands-examples/) for adaptable patterns:
+
+| Command | Purpose | Domain |
+|---------|---------|--------|
+| `/odoo-spec` | Interview-based requirements | Odoo |
+| `/odoo-validate` | Module validation | Odoo |
+| `/vps-upgrade` | Deploy + upgrade module | DevOps |
+
+Adapt these for your domain (mobile, API, infrastructure, etc.).
 
 ## Documentation
 
@@ -138,29 +207,50 @@ The `.context/` system captures institutional knowledge - not just what the code
 
 The GitHub workflow commands reduce friction in issue-driven development. Type `/gh-start 42` instead of manually assigning, creating branches, and remembering issue numbers.
 
-## FLOW Methodology (Experimental)
+## FLOW v2: GitHub-Native Workflow
 
-The `flow-artifacts/` directory contains a concrete implementation of the [FLOW methodology](https://flow-methodology.com) - an AI-native, post-agile approach to software development.
+The `flow-artifacts/` directory contains **FLOW v2** - a GitHub-native implementation of AI-native development that eliminates file-based tracking in favor of GitHub Issues, Milestones, and Labels.
 
 ```
 flow-artifacts/
-├── .flow/                    # Work coordination (dynamic)
+├── .flow/
 │   ├── FLOW.md               # Hub - start here
-│   ├── streams/              # Objective groupings
-│   ├── objectives/           # Individual work units
-│   ├── agents/               # Autonomy levels & handover
-│   ├── metrics/              # Throughput, cycle time
-│   └── ceremonies/           # Async rituals
+│   ├── statusline.sh         # Claude Code statusline integration
+│   ├── update-state.sh       # State updater (queries GitHub)
+│   └── .gitignore            # state.json (cached, ephemeral)
 └── .claude-commands/         # /flow-* slash commands
 ```
 
-Key concepts:
-- **Streams over sprints** - Related objectives flow continuously
-- **Autonomy levels** - Trust boundaries for AI agents (Level 0-3)
-- **Async ceremonies** - No mandatory meetings, event-triggered
-- **Ship when ready** - No artificial sprint boundaries
+**Key improvements over v1:**
+- **GitHub is source of truth** - No duplicate state, no merge conflicts
+- **Statusline integration** - Real-time project state in Claude Code statusline
+- **Specs workflow** - Requirements capture before implementation
+- **Battle-tested** - Extracted from production Odoo deployment
 
-See [flow-artifacts/.flow/FLOW.md](flow-artifacts/.flow/FLOW.md) for details.
+**Core concepts:**
+- **Streams = Milestones** - Related work flows together
+- **Objectives = Issues** - Track work in GitHub
+- **Autonomy levels** - Labels control AI agent trust boundaries (0-3)
+- **Ship when ready** - No sprint boundaries
+
+**Quick start:**
+```bash
+# Set up labels
+gh label create "active" --color "0E8A16"
+gh label create "size/M" --color "7CB3F7"
+# ... (see FLOW.md for full list)
+
+# Copy FLOW artifacts
+cp -r flow-artifacts/.flow your-project/
+cp -r flow-artifacts/.claude-commands/* your-project/.claude/commands/
+
+# Start using
+/flow-status              # See all work
+/flow-start 42            # Claim issue, create branch
+/flow-ship                # PR + merge + deploy
+```
+
+See [FLOW_V2_MIGRATION.md](FLOW_V2_MIGRATION.md) for evolution from v1 and [flow-artifacts/.flow/FLOW.md](flow-artifacts/.flow/FLOW.md) for details.
 
 ## Credits
 
