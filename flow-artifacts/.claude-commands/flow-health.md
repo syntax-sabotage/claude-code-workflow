@@ -16,25 +16,28 @@ gh auth status
 gh repo view --json name,url
 ```
 
-3. **Check Docker Environment**
+3. **Check Development Environment**
+
+Adapt to your project's stack:
 ```bash
-docker ps | grep odoo
-docker logs odoo19-dev --tail=20
+# Example: Docker-based project
+# docker ps | grep <service-name>
+# docker logs <container> --tail=20
+
+# Example: Local dev server
+# curl -s http://localhost:3000/health
+
+# Example: Database check
+# psql $DATABASE_URL -c "SELECT 1"
 ```
 
-4. **Check Production (VPS)**
+4. **Check Production (If Applicable)**
 ```bash
-ssh root@185.163.117.155 "systemctl status odoo && tail -20 /var/log/odoo/odoo.log"
+# Example: SSH to production
+# ssh $PROD_HOST "systemctl status $SERVICE && tail -20 /var/log/$SERVICE/$SERVICE.log"
 ```
 
-5. **Verify Sync State**
-```bash
-# Compare local and Docker
-diff -rq addons/invoice_pro/ /Users/larsweiler/Dev-Odoo19/docker/odoo/addons/invoice_pro/ \
-  --exclude='__pycache__' --exclude='*.pyc'
-```
-
-6. **Check .context/ Freshness**
+5. **Check .context/ Freshness**
 ```bash
 git log -1 --format="%ar" -- .context/
 ```
@@ -51,21 +54,15 @@ git log -1 --format="%ar" -- .context/
 
 ### GitHub
 - Auth: OK
-- Repo: lweiler-lab/it-beratung
+- Repo: org/project
 
-### Docker Dev Environment
-- Container: odoo19-dev (running)
-- Uptime: 3 days
-- Last log: "INFO odoo.modules.loading: Modules loaded"
-
-### Production (VPS)
-- Service: odoo (active)
-- Uptime: 15 days
+### Development Environment
+- Status: Running
 - Last log: [normal operation]
 
-### Sync Status
-- Local <-> Docker: IN SYNC
-- Local <-> Prod: [check manually before deploy]
+### Production
+- Service: active
+- Uptime: 15 days
 
 ### .context/ Freshness
 - Last updated: 1 day ago
@@ -76,30 +73,7 @@ git log -1 --format="%ar" -- .context/
 - Blocked: 0
 - Pool: 3
 
-### Overall: HEALTHY ✓
-```
-
-## Quick Fixes
-
-### Docker Not Running
-```bash
-cd /Users/larsweiler/Dev-Odoo19/docker
-docker-compose up -d odoo19
-```
-
-### Out of Sync
-```bash
-rsync -av --exclude='__pycache__' --exclude='*.pyc' --exclude='.git' --delete \
-  addons/invoice_pro/ \
-  /Users/larsweiler/Dev-Odoo19/docker/odoo/addons/invoice_pro/
-docker-compose restart odoo19
-```
-
-### Production Issues
-```bash
-ssh root@185.163.117.155
-systemctl restart odoo
-tail -f /var/log/odoo/odoo.log
+### Overall: HEALTHY
 ```
 
 ## When to Run
@@ -108,3 +82,8 @@ tail -f /var/log/odoo/odoo.log
 - Before deploying to production
 - When things seem broken
 - After major changes
+
+## Customization
+
+Replace the placeholder commands above with your project-specific checks.
+For a concrete example, see `templates/.claude-commands-examples/vps-upgrade.md`.

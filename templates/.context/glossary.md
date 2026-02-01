@@ -2,6 +2,11 @@
 
 Project-specific terms. Use consistently in code, docs, and communication.
 
+> **How to fill this out:** Add terms that are specific to your project's domain.
+> Focus on terms that Claude might misinterpret or use inconsistently.
+> Include the database column/table name and code variable name for each entity
+> so Claude generates consistent code. Remove placeholder sections you don't need.
+
 ## Core Entities
 
 ### User

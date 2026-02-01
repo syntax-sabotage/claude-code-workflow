@@ -637,24 +637,7 @@ Monthly: Review .context files for accuracy. Remove outdated info.
 
 ## Quick Reference
 
-### File Purposes
-
-| File | Purpose | When to Read |
-|------|---------|--------------|
-| `substrate.md` | Navigation hub | Every session start |
-| `ai-rules.md` | Hard constraints | Before writing ANY code |
-| `anti-patterns.md` | What NOT to do | Before writing code |
-| `glossary.md` | Domain vocabulary | When confused about terms |
-| `SESSION_HANDOVER.md` | Current state | Resuming work |
-
-### Slash Commands
-
-| Command | What It Does |
-|---------|--------------|
-| `/gh-status` | Show issues, PRs, current branch |
-| `/gh-start <N>` | Assign issue N, create branch |
-| `/gh-done` | Push and create PR |
-| `/gh-bug` | Create bug issue from conversation |
+See [README.md](README.md) for the complete file reference table, slash command list, and FLOW commands.
 
 ### Typical Workflow
 

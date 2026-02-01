@@ -1,5 +1,7 @@
 # /vps-upgrade - Upgrade Module on VPS
 
+> **Note:** This is a project-specific example from an Odoo deployment. Adapt the paths, SSH targets, and commands to your own infrastructure.
+
 Quick command to upgrade a module on the production VPS.
 
 ## Usage

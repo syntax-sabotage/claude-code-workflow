@@ -47,38 +47,26 @@ gh issue close <issue#> --comment "## Completed
 gh issue edit <issue#> --remove-label "active"
 ```
 
-6. **Verify Modules (Pre-Deploy Check)**
-```bash
-# Fetch latest sources
-./deploy.py
+6. **Deploy (Project-Specific)**
 
-# Verify all required modules available
-./deploy.py verify
+Adapt these steps to your deployment pipeline:
+
+```bash
+# Example: Run pre-deploy checks
+# ./deploy.sh --dry-run
+
+# Example: Deploy to staging
+# ./deploy.sh staging
+
+# Example: Deploy to production
+# ./deploy.sh production
+
+# Example: Verify deployment
+# ssh $PROD_HOST "systemctl status $SERVICE && journalctl -u $SERVICE -n 20 --no-pager"
 ```
 
-7. **Deploy to Docker (Test)**
-```bash
-# Preview what will be deployed
-./deploy.py --dry-run docker
-
-# Deploy and restart Odoo
-./deploy.py docker
-
-# Verify: Check Odoo logs for module errors
-docker-compose -f /Users/larsweiler/Dev-Odoo19/docker/docker-compose.yml logs --tail=50 odoo19
-```
-
-8. **Deploy to Production (If Ready)**
-```bash
-# Preview production deployment
-./deploy.py --dry-run vps
-
-# Deploy to production and restart
-./deploy.py vps
-
-# Verify: Check Odoo service status
-ssh root@185.163.117.155 "systemctl status odoo19 && journalctl -u odoo19 -n 20 --no-pager"
-```
+> **Note:** Replace the above with your project's actual deployment commands.
+> See `templates/.claude-commands-examples/vps-upgrade.md` for a concrete example.
 
 9. **Check for Reflection Trigger**
 ```bash
@@ -103,9 +91,8 @@ If 3+ unreflected: Suggest `/flow-reflect <stream>`
 - #52 merged to main
 
 ### Deployment
-- [x] Modules verified (./deploy.py verify)
-- [x] Docker dev environment updated
-- [x] Docker logs checked - no errors
+- [x] Pre-deploy checks passed
+- [x] Staging verified
 - [x] Production deployed
 - [x] Production service healthy
 

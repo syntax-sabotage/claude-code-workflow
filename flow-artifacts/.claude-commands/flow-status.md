@@ -39,16 +39,18 @@ gh issue list --state open --milestone "<stream>" --json number,title,labels
 gh issue list --state closed --limit 10 --json number,title,closedAt,milestone
 ```
 
-7. **Module Status (from modules.lock)**
+7. **Project-Specific Status (Optional)**
 ```bash
-# Show what modules are configured and their versions
-./deploy.py --dry-run docker 2>/dev/null || cat modules.lock | grep -E "^name|^version"
+# Add project-specific status checks here, e.g.:
+# npm run build --dry-run
+# ./deploy.sh status
+# cat package.json | jq '.version'
 ```
 
 ## Output Format
 
 ```
-## FLOW Status - IT-Beratung Odoo
+## FLOW Status - {{PROJECT_NAME}}
 
 ### Streams (Milestones)
 | Stream | Open | Description |
@@ -71,17 +73,6 @@ gh issue list --state closed --limit 10 --json number,title,closedAt,milestone
 ### Recent Completions (Last 7 Days)
 - #45 [Invoice Pro] Fixed validation bug
 - #44 [Security] Updated access rules
-
-### Module Versions (modules.lock)
-| Module | Source | Version | Required |
-|--------|--------|---------|----------|
-| foundation | praetorx | 19.0.1.3.18 | yes |
-| praetorx_base | praetorx | 19.0.1.1.2 | yes |
-| invoice_pro | praetorx | 19.0.1.0.16 | yes |
-| mcp_security | praetorx | 19.0.1.0.8 | yes |
-| praetorx_vault | praetorx | 19.0.3.0.11 | no |
-| scribe | praetorx | 19.0.1.1.12 | no |
-| social_media_management | local | 19.0.1.0.0 | yes |
 
 ### Summary
 - 3 active objectives

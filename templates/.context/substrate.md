@@ -2,7 +2,7 @@
 
 > <!-- One-line description of what this project does -->
 
-**Quick Start**: See [CLAUDE.md](../CLAUDE.md) for AI assistant onboarding.
+**Quick Start**: See your project's `CLAUDE.md` (create one at project root) for AI assistant onboarding.
 
 ## Quick Navigation
 

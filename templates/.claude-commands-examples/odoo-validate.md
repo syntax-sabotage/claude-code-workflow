@@ -42,7 +42,8 @@ If no module_path provided, validates all modules in `addons/`.
 ### Access Rules (Prevents AccessError)
 Every model with `_name = 'x.y.z'` needs:
 - Entry in `security/ir.model.access.csv`
-- Format: `access_model_name,access_model_name,module.model_x_y_z,base.group_user,1,1,1,0`
+- Format: `access_name,access_description,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink`
+- Example: `access_x_y_z,access_x_y_z,model_x_y_z,base.group_user,1,1,1,0`
 
 ### Sensitive Fields (Prevents Credential Exposure)
 Fields named with password/token/secret/api_key patterns need:

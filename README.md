@@ -55,6 +55,12 @@ When working in any project directory, check for a `.context/` folder. If presen
 2. For coding tasks, read `.context/ai-rules.md` before writing any code
 3. Check `.context/anti-patterns.md` to avoid known pitfalls
 
+### When Writing Code
+Always consult before generating code:
+- `.context/ai-rules.md` - Coding standards and constraints
+- `.context/glossary.md` - Project-specific terminology
+- `.context/anti-patterns.md` - Patterns to avoid
+
 ### Key Principle
 The .context folder contains institutional knowledge about WHY decisions were made.
 Prefer patterns documented there over generic best practices.
@@ -95,6 +101,7 @@ gh label create "priority/low" --color "0E8A16"
 gh label create "type/bug" --color "D73A4A"
 gh label create "type/feature" --color "0075CA"
 gh label create "type/debt" --color "CFD3D7"
+gh label create "type/security" --color "B60205"
 gh label create "status/blocked" --color "FEF2C0"
 gh label create "status/review" --color "5319E7"
 ```
@@ -189,6 +196,8 @@ See [templates/.claude-commands-examples/](templates/.claude-commands-examples/)
 | `/vps-upgrade` | Deploy + upgrade module | DevOps |
 
 Adapt these for your domain (mobile, API, infrastructure, etc.).
+
+**When to create domain commands:** Use `/gh-*` commands for standard issue workflow. Create domain-specific commands (like `/odoo-spec`, `/vps-upgrade`) when you have repetitive project-specific tasks that involve multiple steps, specific tools, or domain knowledge that generic commands can't capture.
 
 ## Documentation
 
