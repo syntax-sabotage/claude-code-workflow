@@ -2,6 +2,8 @@
 
 A practical workflow system for [Claude Code](https://claude.ai/code) that combines project knowledge documentation, GitHub-based task management, and multi-project coordination.
 
+**Website:** For the methodology, principles, and reasoning behind FLOW, visit [flow-methodology.com](https://flow-methodology.com)
+
 ## What This Is
 
 A production-tested workflow system for working effectively with Claude Code on real projects:

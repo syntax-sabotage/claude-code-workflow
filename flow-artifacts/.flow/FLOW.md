@@ -1,6 +1,7 @@
 # FLOW Hub - {{PROJECT_NAME}}
 
 > Fluid Learning Optimization Workflow - AI-native development without sprints.
+> **Website:** [flow-methodology.com](https://flow-methodology.com) | **Repo:** [claude-code-workflow](https://github.com/syntax-sabotage/claude-code-workflow)
 
 **Current State:** v2 - GitHub-native tracking
 **Source of Truth:** GitHub (milestones, issues, labels)
