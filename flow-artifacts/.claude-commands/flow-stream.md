@@ -76,7 +76,7 @@ gh api repos/{owner}/{repo}/milestones -f title="<name>" -f description="<desc>"
 - Due: 2026-03-01
 
 ### URL
-https://github.com/lweiler-lab/it-beratung/milestone/4
+https://github.com/{{owner}}/{{repo}}/milestone/4
 
 ### Next Steps
 Add objectives with: /flow-objective "<title>"

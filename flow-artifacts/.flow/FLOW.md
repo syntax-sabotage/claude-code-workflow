@@ -24,16 +24,16 @@ Each command is defined in `.claude-commands/` (copy to your project's `.claude/
 
 | Command | Purpose | Definition |
 |---------|---------|------------|
-| `/flow-status` | Query milestones + issues via `gh` | [flow-status.md](../../../flow-artifacts/.claude-commands/flow-status.md) |
-| `/flow-start <issue#>` | Claim issue + create branch | [flow-start.md](../../../flow-artifacts/.claude-commands/flow-start.md) |
-| `/flow-stream <name>` | Query/create milestone, list stream issues | [flow-stream.md](../../../flow-artifacts/.claude-commands/flow-stream.md) |
-| `/flow-objective <title>` | `gh issue create` with milestone + labels | [flow-objective.md](../../../flow-artifacts/.claude-commands/flow-objective.md) |
-| `/flow-ship` | Close issue + PR + merge + deploy | [flow-ship.md](../../../flow-artifacts/.claude-commands/flow-ship.md) |
-| `/flow-triage` | Assign milestones to `needs-triage` issues | [flow-triage.md](../../../flow-artifacts/.claude-commands/flow-triage.md) |
-| `/flow-reflect <stream>` | Synthesize learnings -> `.context/`, add `reflected` label | [flow-reflect.md](../../../flow-artifacts/.claude-commands/flow-reflect.md) |
-| `/flow-handover` | End session summary | [flow-handover.md](../../../flow-artifacts/.claude-commands/flow-handover.md) |
-| `/flow-resume` | Start session, query current state | [flow-resume.md](../../../flow-artifacts/.claude-commands/flow-resume.md) |
-| `/flow-health` | System health check | [flow-health.md](../../../flow-artifacts/.claude-commands/flow-health.md) |
+| `/flow-status` | Query milestones + issues via `gh` | [flow-status.md](../.claude-commands/flow-status.md) |
+| `/flow-start <issue#>` | Claim issue + create branch | [flow-start.md](../.claude-commands/flow-start.md) |
+| `/flow-stream <name>` | Query/create milestone, list stream issues | [flow-stream.md](../.claude-commands/flow-stream.md) |
+| `/flow-objective <title>` | `gh issue create` with milestone + labels | [flow-objective.md](../.claude-commands/flow-objective.md) |
+| `/flow-ship` | Close issue + PR + merge + deploy | [flow-ship.md](../.claude-commands/flow-ship.md) |
+| `/flow-triage` | Assign milestones to `needs-triage` issues | [flow-triage.md](../.claude-commands/flow-triage.md) |
+| `/flow-reflect <stream>` | Synthesize learnings -> `.context/`, add `reflected` label | [flow-reflect.md](../.claude-commands/flow-reflect.md) |
+| `/flow-handover` | End session summary | [flow-handover.md](../.claude-commands/flow-handover.md) |
+| `/flow-resume` | Start session, query current state | [flow-resume.md](../.claude-commands/flow-resume.md) |
+| `/flow-health` | System health check | [flow-health.md](../.claude-commands/flow-health.md) |
 
 ## Streams (Milestones)
 

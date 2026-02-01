@@ -16,20 +16,20 @@ Quick command to upgrade a module on the production VPS.
 
 2. **Execute the upgrade**:
 ```bash
-source /Volumes/External/Development/odoo-projects/customer-deployments/it-beratung/.env && \
-ssh $VPS_SSH_ALIAS "sudo systemctl stop odoo19 && \
-  sudo -u odoo19 /opt/odoo19/venv/bin/python /opt/odoo19/odoo/odoo-bin \
-    -c /etc/odoo19.conf \
-    -d odoo_itberatung \
+source .env && \
+ssh $VPS_SSH_ALIAS "sudo systemctl stop $SERVICE_NAME && \
+  sudo -u $SERVICE_USER $VENV_PATH/bin/python $ODOO_PATH/odoo-bin \
+    -c $SERVICE_CONFIG \
+    -d $DATABASE_NAME \
     -u <MODULE_NAME> \
     --stop-after-init && \
-  sudo systemctl start odoo19"
+  sudo systemctl start $SERVICE_NAME"
 ```
 
 3. **Verify**:
 ```bash
-source .env && ssh $VPS_SSH_ALIAS "systemctl status odoo19 | head -10"
-source .env && ssh $VPS_SSH_ALIAS "tail -30 /var/log/odoo/odoo19.log | grep -E '(ERROR|CRITICAL|Modules loaded)'"
+source .env && ssh $VPS_SSH_ALIAS "systemctl status $SERVICE_NAME | head -10"
+source .env && ssh $VPS_SSH_ALIAS "tail -30 $LOG_PATH | grep -E '(ERROR|CRITICAL|Modules loaded)'"
 ```
 
 4. **Report result** to user:
@@ -42,10 +42,10 @@ source .env && ssh $VPS_SSH_ALIAS "tail -30 /var/log/odoo/odoo19.log | grep -E '
 | Setting | Value |
 |---------|-------|
 | SSH | `$VPS_SSH_ALIAS` from `.env` |
-| User | `odoo19` |
-| Database | `odoo_itberatung` |
-| Config | `/etc/odoo19.conf` |
-| Addons | `/opt/odoo19/addons-foundation-prod/` |
+| User | `$SERVICE_USER` from `.env` |
+| Database | `$DATABASE_NAME` from `.env` |
+| Config | `$SERVICE_CONFIG` from `.env` |
+| Addons | `$ADDONS_PATH` from `.env` |
 
 ## When to Use
 

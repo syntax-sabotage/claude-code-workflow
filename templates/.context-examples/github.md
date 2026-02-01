@@ -4,8 +4,8 @@
 
 ## Repository
 
-- **Repo**: `lweiler-lab/it-beratung` (private)
-- **URL**: https://github.com/lweiler-lab/it-beratung
+- **Repo**: `{{GITHUB_ORG}}/{{GITHUB_REPO}}` (private)
+- **URL**: https://github.com/{{GITHUB_ORG}}/{{GITHUB_REPO}}
 
 ## Claude Code GitHub Workflows
 
@@ -68,7 +68,7 @@ gh pr comment 123 --body "@claude Fix the failing tests"
 
 ## Resources
 
-- Actions: https://github.com/lweiler-lab/it-beratung/actions
-- Issues: https://github.com/lweiler-lab/it-beratung/issues
-- PRs: https://github.com/lweiler-lab/it-beratung/pulls
+- Actions: https://github.com/{{GITHUB_ORG}}/{{GITHUB_REPO}}/actions
+- Issues: https://github.com/{{GITHUB_ORG}}/{{GITHUB_REPO}}/issues
+- PRs: https://github.com/{{GITHUB_ORG}}/{{GITHUB_REPO}}/pulls
 - Claude Code Action: https://github.com/anthropics/claude-code-action

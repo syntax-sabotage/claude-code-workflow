@@ -73,7 +73,7 @@ gh issue edit <number> --add-label "autonomy/<level>"
 **Type:** feature
 **Autonomy:** 2
 
-**URL:** https://github.com/lweiler-lab/it-beratung/issues/48
+**URL:** https://github.com/{{owner}}/{{repo}}/issues/48
 
 Start work with: /flow-start 48
 ```
