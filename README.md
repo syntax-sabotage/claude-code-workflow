@@ -1,272 +1,96 @@
-# Claude Code Workflow
+# FLOW
 
-A practical workflow system for [Claude Code](https://claude.ai/code) that combines project knowledge documentation, GitHub-based task management, and multi-project coordination.
+FLOW is a mixed human-agent team workflow for software projects. It is not an acronym. It is a way of structuring how humans and AI agents collaborate on a codebase — using GitHub natively, with clear role boundaries and trust levels.
 
-**Website:** For the methodology, principles, and reasoning behind FLOW, visit [flow-methodology.com](https://flow-methodology.com)
+## The team model
 
-## What This Is
+A FLOW team combines a human developer with specialized Claude agents:
 
-A production-tested workflow system for working effectively with Claude Code on real projects:
+| Role | Agent | Trigger |
+|------|-------|---------|
+| Human Dev | You | Direct work, setup, review decisions |
+| Review Agent | K2SO | `/flow-review <MR#>` |
+| Agentic Dev | Kleya | `/flow-runner start` |
+| Agentic Dev | Cassian | `/flow-runner start` |
 
-- **`.context/` system** - Structured project documentation that Claude reads on demand (based on [andrefigueira/.context](https://github.com/andrefigueira/.context))
-- **CLAUDE.md hierarchy** - Cascading configuration from global preferences to project-specific rules
-- **FLOW v2** - GitHub-native AI-native workflow (milestones, issues, labels)
-- **Statusline integration** - Real-time project state in Claude Code
-- **Slash commands** - Custom skills for issue-driven development
-- **Session handover** - Context continuity between coding sessions
+**K2SO** checks out a branch, runs a full review checklist, and posts findings as BLOCKER / WARNING / NOTE — then sets the review label. It does not merge.
 
-## What's New in v2
+**Kleya and Cassian** are agentic developers. They pick up issues, create branches, write code, open PRs. They run autonomously within their assigned trust level.
 
-**January 2026** - Major update based on production learnings:
+## Workstations and worktrees
 
-✨ **FLOW v2** - GitHub-native tracking (no more file-based objectives)
-- Milestones = Streams
-- Issues = Objectives
-- Labels = Status/size/autonomy
-- No merge conflicts, single source of truth
-
-✨ **Statusline integration** - See active work in Claude Code statusline:
-```
-[Sonnet] #47 Implement sync | Invoice Pro | 1 blocked | 2 PR * | 45% | $0.23
-```
-
-✨ **Specs workflow** - Interview-based requirements capture for complex features
-
-✨ **Advanced examples**:
-- Real `.context/` patterns (GitHub integration, deployment docs, specs)
-- Domain-specific commands (requirements, validation, deployment)
-- Adaptable templates for any domain
-
-✨ **Battle-tested** - Extracted from production Odoo deployment managing 60+ modules
-
-See [FLOW_V2_MIGRATION.md](FLOW_V2_MIGRATION.md) for the evolution story.
-
-## Quick Start
-
-### 1. Set up global config
-
-Add to `~/.claude/CLAUDE.md`:
-
-```markdown
-## .context Project Knowledge System
-
-When working in any project directory, check for a `.context/` folder. If present:
-
-### On Session Start
-1. Read `.context/substrate.md` first - it's the navigation hub
-2. For coding tasks, read `.context/ai-rules.md` before writing any code
-3. Check `.context/anti-patterns.md` to avoid known pitfalls
-
-### When Writing Code
-Always consult before generating code:
-- `.context/ai-rules.md` - Coding standards and constraints
-- `.context/glossary.md` - Project-specific terminology
-- `.context/anti-patterns.md` - Patterns to avoid
-
-### Key Principle
-The .context folder contains institutional knowledge about WHY decisions were made.
-Prefer patterns documented there over generic best practices.
-```
-
-See [templates/global-claude-md.md](templates/global-claude-md.md) for the full template.
-
-### 2. Add .context to your project
-
-Copy the template folder:
-
-```bash
-cp -r templates/.context your-project/.context
-```
-
-Fill in the placeholders in each file:
-- `substrate.md` - Project overview, tech stack, navigation
-- `ai-rules.md` - Hard coding constraints
-- `anti-patterns.md` - What NOT to do
-- `glossary.md` - Domain terminology
-- `SESSION_HANDOVER.md` - Current state
-
-### 3. Add GitHub workflow commands
-
-Copy the commands folder:
-
-```bash
-cp -r templates/.claude-commands your-project/.claude/commands
-```
-
-Set up labels (run once per repo):
-
-```bash
-gh label create "priority/critical" --color "B60205"
-gh label create "priority/high" --color "D93F0B"
-gh label create "priority/medium" --color "FBCA04"
-gh label create "priority/low" --color "0E8A16"
-gh label create "type/bug" --color "D73A4A"
-gh label create "type/feature" --color "0075CA"
-gh label create "type/debt" --color "CFD3D7"
-gh label create "type/security" --color "B60205"
-gh label create "status/blocked" --color "FEF2C0"
-gh label create "status/review" --color "5319E7"
-```
-
-### 4. Use the workflow
-
-```bash
-/gh-status              # See what needs attention
-/gh-start 12            # Start work on issue #12
-# ... code ...
-/gh-done                # Create PR linked to issue
-```
-
-## Repository Structure
+Each agent gets a named git worktree — a full checkout of the repo at its own path, with an isolated Docker stack:
 
 ```
-claude-code-workflow/
-├── README.md                         # You are here
-├── GUIDE.md                          # Full documentation
-├── FLOW_V2_MIGRATION.md              # v1 → v2 evolution guide
-├── flow-artifacts/                   # FLOW v2 implementation
-│   ├── .flow/
-│   │   ├── FLOW.md                   # Hub
-│   │   ├── statusline.sh             # Statusline integration
-│   │   ├── update-state.sh           # State updater
-│   │   └── .gitignore                # Ephemeral state
-│   └── .claude-commands/             # /flow-* commands
-└── templates/
-    ├── global-claude-md.md           # Add to ~/.claude/CLAUDE.md
-    ├── .context/                     # Basic .context templates
-    │   ├── substrate.md
-    │   ├── ai-rules.md
-    │   ├── anti-patterns.md
-    │   ├── glossary.md
-    │   └── SESSION_HANDOVER.md
-    ├── .context-examples/            # Advanced patterns (NEW)
-    │   ├── README.md                 # How to use examples
-    │   ├── github.md                 # GitHub integration
-    │   └── specs-README.md           # Requirements workflow
-    ├── .claude-commands/             # Basic GitHub commands
-    │   ├── gh-status.md
-    │   ├── gh-start.md
-    │   ├── gh-done.md
-    │   └── gh-bug.md
-    └── .claude-commands-examples/    # Domain commands (NEW)
-        ├── README.md                 # How to adapt
-        ├── odoo-spec.md              # Requirements interview
-        ├── odoo-validate.md          # Module validation
-        └── vps-upgrade.md            # Deployment command
+your-project/          # main — shared state, CI
+your-project-Kleya/    # Kleya's workstation
+your-project-Cassian/  # Cassian's workstation
+your-project-K2SO/     # K2SO's review station
+your-project-109/      # ephemeral issue worktree
 ```
 
-## The Five Core Files
+**Named workstations** are persistent. Each has its own branch, staging environment, and Docker stack. `./start.sh` auto-detects which worktree it is running from.
 
-| File | Purpose | When to Read |
-|------|---------|--------------|
-| `substrate.md` | Navigation hub, tech stack | Every session start |
-| `ai-rules.md` | Hard coding constraints | Before writing ANY code |
-| `anti-patterns.md` | What NOT to do | Before writing code |
-| `glossary.md` | Domain vocabulary | When confused about terms |
-| `SESSION_HANDOVER.md` | Current state, open tasks | Resuming work |
+**Ephemeral issue worktrees** are created per issue via `/flow-worktree create <#>`. Code-only — no Docker stack.
 
-## Slash Commands
+**Shared state** (`.flow/state.json`, cost logs) always lives in the main worktree. Agents read it; they never write to each other's paths.
 
-### GitHub Commands (Basic)
+Detection rule: `project-[A-Za-z]+` = workstation. `project-[0-9]+` = issue worktree.
 
-| Command | What It Does |
-|---------|--------------|
-| `/gh-status` | Show issues, PRs, current branch |
-| `/gh-start <N>` | Assign issue N, create feature branch |
-| `/gh-done` | Push changes and create PR |
-| `/gh-bug` | Create bug issue from conversation |
+## GitHub as the coordination layer
 
-### FLOW Commands (Advanced)
+FLOW is GitHub-native. There are no external tools, no dashboards, no middleware. Everything lives in Issues, Labels, and Milestones.
 
-| Command | What It Does |
-|---------|--------------|
-| `/flow-status` | Query all milestones + issues via `gh` |
-| `/flow-start <N>` | Claim issue, create branch, update statusline |
-| `/flow-ship` | PR + merge + close issue + deploy |
-| `/flow-resume` | Start session, query current state |
-| `/flow-handover` | End session summary |
-| `/flow-reflect <stream>` | Synthesize learnings → `.context/` |
+- **Issues** are the unit of work
+- **Labels** control flow and trust levels
+- **Milestones** define scope
+- **PRs** trigger the review loop
 
-### Domain-Specific Commands (Examples)
+Agents read GitHub state to decide what to work on next. The human sets the labels.
 
-See [templates/.claude-commands-examples/](templates/.claude-commands-examples/) for adaptable patterns:
+## Autonomy levels
 
-| Command | Purpose | Domain |
-|---------|---------|--------|
-| `/odoo-spec` | Interview-based requirements | Odoo |
-| `/odoo-validate` | Module validation | Odoo |
-| `/vps-upgrade` | Deploy + upgrade module | DevOps |
+Labels on issues set the trust boundary for agents:
 
-Adapt these for your domain (mobile, API, infrastructure, etc.).
+| Label | Meaning |
+|-------|---------|
+| `autonomy::0` | Human does the work |
+| `autonomy::1` | Agent proposes, human approves each step |
+| `autonomy::2` | Agent executes, human reviews output |
+| `autonomy::3` | Agent executes and merges without review |
 
-**When to create domain commands:** Use `/gh-*` commands for standard issue workflow. Create domain-specific commands (like `/odoo-spec`, `/vps-upgrade`) when you have repetitive project-specific tasks that involve multiple steps, specific tools, or domain knowledge that generic commands can't capture.
+Most work runs at `autonomy::2`. The human moves issues to `autonomy::3` only for well-understood, low-risk tasks.
 
-## Documentation
+## Institutional memory with `.context/`
 
-- [GUIDE.md](GUIDE.md) - Full workflow documentation including:
-  - CLAUDE.md hierarchy explained
-  - Complete .context system setup
-  - Onboarding existing projects
-  - Multi-project coordination
-  - Maintenance practices
-
-## Why This Exists
-
-Claude Code is powerful but works better with context. Instead of explaining your project's patterns, tech stack, and conventions every session, document them once and let Claude read them.
-
-The `.context/` system captures institutional knowledge - not just what the code does, but why decisions were made. This prevents Claude from suggesting patterns your team already rejected, or using conventions that conflict with your codebase.
-
-The GitHub workflow commands reduce friction in issue-driven development. Type `/gh-start 42` instead of manually assigning, creating branches, and remembering issue numbers.
-
-## FLOW v2: GitHub-Native Workflow
-
-The `flow-artifacts/` directory contains **FLOW v2** - a GitHub-native implementation of AI-native development that eliminates file-based tracking in favor of GitHub Issues, Milestones, and Labels.
+Each project has a `.context/` folder containing structured knowledge for agents:
 
 ```
-flow-artifacts/
-├── .flow/
-│   ├── FLOW.md               # Hub - start here
-│   ├── statusline.sh         # Claude Code statusline integration
-│   ├── update-state.sh       # State updater (queries GitHub)
-│   └── .gitignore            # state.json (cached, ephemeral)
-└── .claude-commands/         # /flow-* slash commands
+.context/
+  substrate.md        # navigation hub — read this first
+  ai-rules.md         # coding standards, naming conventions, architecture rules
+  glossary.md         # project-specific terminology
+  architecture/       # system design decisions
+  auth/               # authentication and security patterns
+  api/                # API conventions
+  database/           # schema and model conventions
+  debt.md             # known technical debt and priorities
 ```
 
-**Key improvements over v1:**
-- **GitHub is source of truth** - No duplicate state, no merge conflicts
-- **Statusline integration** - Real-time project state in Claude Code statusline
-- **Specs workflow** - Requirements capture before implementation
-- **Battle-tested** - Extracted from production Odoo deployment
+Agents read `.context/ai-rules.md` before writing any code. The substrate.md explains what exists and why — not just what. This is institutional memory that survives context resets.
 
-**Core concepts:**
-- **Streams = Milestones** - Related work flows together
-- **Objectives = Issues** - Track work in GitHub
-- **Autonomy levels** - Labels control AI agent trust boundaries (0-3)
-- **Ship when ready** - No sprint boundaries
+## Skills
 
-**Quick start:**
-```bash
-# Set up labels
-gh label create "active" --color "0E8A16"
-gh label create "size/M" --color "7CB3F7"
-# ... (see FLOW.md for full list)
+| Skill | Who runs it | What it does |
+|-------|------------|--------------|
+| `/flow-runner start` | Agentic Dev | Pick up next issue, work it, open PR |
+| `/flow-review <MR#>` | Review Agent | Review a PR, post findings, set label |
+| `/flow-worktree create <#>` | Any agent | Create ephemeral worktree for an issue |
 
-# Copy FLOW artifacts
-cp -r flow-artifacts/.flow your-project/
-cp -r flow-artifacts/.claude-commands/* your-project/.claude/commands/
+## Setup
 
-# Start using
-/flow-status              # See all work
-/flow-start 42            # Claim issue, create branch
-/flow-ship                # PR + merge + deploy
-```
+See [flow-methodology.com/demo](https://flow-methodology.com/demo/) for a walkthrough of the full setup — team configuration, worktree initialization, and the first run.
 
-See [FLOW_V2_MIGRATION.md](FLOW_V2_MIGRATION.md) for evolution from v1 and [flow-artifacts/.flow/FLOW.md](flow-artifacts/.flow/FLOW.md) for details.
+## Repository
 
-## Credits
-
-The `.context/` system is based on [andrefigueira/.context](https://github.com/andrefigueira/.context) by [Andre Figueira](https://github.com/andrefigueira). This repo extends the concept with GitHub workflow integration and multi-project patterns for Claude Code.
-
-## License
-
-MIT
+This repository contains the FLOW skills (slash commands) used by agents. Each skill is a markdown file in `.claude/commands/` that Claude Code executes when invoked.
