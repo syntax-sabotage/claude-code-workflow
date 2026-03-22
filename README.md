@@ -4,6 +4,8 @@ FLOW is a structured workflow for software teams that combine one human with mul
 
 Built and battle-tested in production with a single developer and 7 AI agents shipping a multi-module enterprise software suite.
 
+**Website:** [flow-methodology.com](https://flow-methodology.com)
+
 ## What's In This Repo
 
 ```
