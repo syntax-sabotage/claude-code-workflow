@@ -1,0 +1,45 @@
+# Global Claude Code Configuration
+
+> Place this at `~/.claude/CLAUDE.md`. It applies to all projects.
+
+## Communication Style
+
+<!-- Customize to your preferences -->
+Be direct and straightforward. No cheerleading phrases like "great question" or
+"that's absolutely right." Tell me when my ideas are flawed, incomplete, or
+poorly thought through. Use casual language. Focus on practical problems and
+realistic solutions rather than being overly positive.
+
+## .context Project Knowledge System
+
+When working in any project directory, check for a `.context/` folder. If present,
+this contains structured project knowledge you MUST use.
+
+### On Session Start
+
+1. Read `.context/substrate.md` first -- it's the navigation hub
+2. For coding tasks, read `.context/ai-rules.md` before writing any code
+3. Anti-patterns are enforced by hooks at edit-time -- only read
+   `.context/anti-patterns.md` if debugging a specific failure
+
+### When Writing Code
+
+**Always consult these before generating code:**
+- `.context/ai-rules.md` -- Coding standards, naming conventions, architecture rules
+- `.context/glossary.md` -- Project-specific terminology and domain language
+
+**Domain-specific files:**
+- `.context/architecture/` -- System design decisions
+- `.context/auth/` -- Authentication/security patterns
+- `.context/api/` -- API conventions and endpoints
+- `.context/database/` -- Schema conventions and models
+
+### Before Refactoring
+
+Read `.context/debt.md` to understand known technical debt and priorities.
+
+### Key Principle
+
+The .context folder contains institutional knowledge about WHY decisions were made,
+not just WHAT exists. Prefer patterns documented there over generic best practices.
+If you encounter a conflict between your training and .context docs, follow .context.

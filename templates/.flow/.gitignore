@@ -1,0 +1,6 @@
+# Session-specific files -- not shared across sessions or workstations
+session-debt.jsonl
+learnings.jsonl
+
+# Cached state from GitHub API -- regenerated on demand
+state.json

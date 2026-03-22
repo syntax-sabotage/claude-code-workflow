@@ -1,0 +1,15 @@
+# Protect branch-specific CLAUDE.md from being overwritten during merges.
+#
+# Each workstation worktree has its own CLAUDE.md with role-specific instructions.
+# Without this, merging main into a workstation branch would overwrite the
+# workstation's CLAUDE.md with main's version.
+#
+# How it works:
+# - `merge=ours` tells git to always keep the current branch's version on conflict
+# - This means each branch's CLAUDE.md stays stable across merges
+# - To intentionally update, manually copy the content
+#
+# Setup (run once per clone):
+#   git config merge.ours.driver true
+
+CLAUDE.md merge=ours

@@ -1,146 +1,107 @@
-# AI Rules - Hard Constraints
+# AI Rules -- Hard Constraints
 
 These rules are **non-negotiable**. Follow them exactly when generating code.
 
-## TypeScript Standards
+## [YOUR_FRAMEWORK] Version Compliance
 
-<!-- Customize for your language/framework -->
+<!-- Replace with your framework's version-specific rules -->
 
-### Strict Mode Required
-```typescript
-// tsconfig.json enforces strict: true
-// NEVER use @ts-ignore, @ts-expect-error, or any type
-// All function parameters and returns must be typed
-```
+- Target version: [YOUR_FRAMEWORK] [VERSION]
+- Deprecated APIs to avoid: [LIST]
+- Required patterns: [LIST]
 
-### Import Patterns
-```typescript
-// CORRECT: Use workspace aliases (if monorepo)
-import { db } from '@myproject/database';
+## Language Rules
 
-// WRONG: Relative imports across packages
-import { db } from '../../../packages/database/src';
-```
+<!-- Define what language is used where -->
 
-### Validation Required
-```typescript
-// ALL external input must be validated
-// Use Zod, Joi, or equivalent
-
-// CORRECT
-export const createItem = procedure
-  .input(createItemSchema)
-  .mutation(async ({ input }) => { ... });
-
-// WRONG: Trusting input without validation
-export const createItem = procedure
-  .mutation(async ({ input }) => { ... }); // NO!
-```
-
-## Database Rules
-
-### Use Query Builder / ORM
-```typescript
-// CORRECT: Type-safe queries
-const items = await db
-  .select()
-  .from(itemsTable)
-  .where(eq(itemsTable.userId, userId));
-
-// WRONG: Raw SQL with string interpolation
-const items = await db.execute(`SELECT * FROM items WHERE user_id = '${userId}'`);
-```
-
-### Tenant Isolation (if multi-tenant)
-```typescript
-// EVERY query on tenant data MUST include tenant filter
-
-// CORRECT
-.where(
-  and(
-    eq(table.organizationId, ctx.organizationId),
-    eq(table.id, input.id)
-  )
-)
-
-// WRONG: Missing tenant filter = data leak
-.where(eq(table.id, input.id))
-```
-
-## Error Handling
-
-```typescript
-// Use specific error codes
-throw new AppError({
-  code: 'NOT_FOUND',
-  message: 'Item not found',
-});
-
-// NEVER expose internal errors to clients
-// NEVER include stack traces in production responses
-```
+| Context | Language |
+|---------|----------|
+| User-facing content | [YOUR_UI_LANGUAGE] |
+| Code, comments, docs | [English recommended] |
+| Commit messages | [English recommended] |
+| Variable/function names | [English recommended] |
 
 ## Naming Conventions
 
 ### Files
 | Type | Convention | Example |
 |------|------------|---------|
-| React components | PascalCase | `ItemForm.tsx` |
-| Utilities | kebab-case | `date-utils.ts` |
-| Routes/handlers | camelCase | `items.ts` |
+| [Components/Views] | [PascalCase/kebab-case] | `[Example.tsx]` |
+| [Utilities/Helpers] | [kebab-case/snake_case] | `[date-utils.ts]` |
+| [Tests] | [Convention] | `[example.test.ts]` |
 
-### Database
+### Code
 | Type | Convention | Example |
 |------|------------|---------|
-| Tables | snake_case plural | `user_items` |
-| Columns | snake_case | `created_at` |
-| Foreign keys | singular_id | `user_id` |
+| [Classes/Types] | [PascalCase] | `[UserProfile]` |
+| [Functions/Methods] | [camelCase/snake_case] | `[createUser]` |
+| [Constants] | [SCREAMING_SNAKE] | `[MAX_RETRIES]` |
+| [Database tables] | [snake_case plural] | `[user_profiles]` |
+| [Database columns] | [snake_case] | `[created_at]` |
 
-### TypeScript
-| Type | Convention | Example |
-|------|------------|---------|
-| Types/Interfaces | PascalCase | `CreateItemInput` |
-| Functions | camelCase | `createItem` |
-| Constants | SCREAMING_SNAKE | `MAX_FILE_SIZE` |
+## Module Architecture
 
-## Security Non-Negotiables
+<!-- How modules/packages should be structured -->
 
-1. **Never log sensitive data**: passwords, tokens, PII
-2. **Never expose internal errors**: use generic messages in production
-3. **Always validate file uploads**: check MIME type AND content
-4. **Always use parameterized queries**: never string concatenation
-5. **Never trust client-side validation alone**: always validate server-side
+```
+[YOUR_MODULE]/
+├── [models/src/lib]       # Business logic
+├── [views/components]     # Presentation
+├── [tests/spec/__tests__] # Tests
+├── [config]               # Configuration
+└── [README.md]            # Module documentation
+```
 
-## Performance Rules
+### Rules
+- [Rule 1: e.g., "Every module must have a README"]
+- [Rule 2: e.g., "No circular dependencies between modules"]
+- [Rule 3: e.g., "Shared code goes in the core/common module"]
 
-1. **Paginate list queries**: default limit, max limit
-2. **Use database indexes**: for foreign keys and frequently queried columns
-3. **Lazy load heavy components**: where applicable
+## Security
+
+1. **Never hardcode credentials** -- use environment variables or secrets manager
+2. **Never log sensitive data** -- passwords, tokens, PII
+3. **Never expose internal errors** -- use generic messages in production
+4. **Always validate external input** -- server-side validation is mandatory
+5. **Always use parameterized queries** -- never string concatenation for SQL
+6. **Copy-sensitive fields** -- tokens, UUIDs, credentials must have `copy=False` (or equivalent immutability)
 
 ## Testing Requirements
 
-### Test File Location
+### Every new module/feature must include:
+- [ ] Unit tests for business logic
+- [ ] Integration tests for API endpoints
+- [ ] Edge case coverage (empty input, max values, invalid data)
+
+### Test structure:
 ```
-// Co-locate tests with source
-src/
-  items.ts
-  items.test.ts
+# [YOUR_FRAMEWORK test pattern]
+# Arrange -> Act -> Assert
 ```
 
-### Test Structure
-```typescript
-describe('items', () => {
-  describe('create', () => {
-    it('creates an item with valid input', async () => {
-      // Arrange, Act, Assert
-    });
-    it('rejects invalid input', async () => { ... });
-  });
-});
+## Commit Messages
+
+Format: `type(scope): description`
+
+Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`
+
+Examples:
 ```
+feat(auth): add OAuth2 provider support
+fix(api): handle null response from external service
+refactor(database): extract query builder utility
+```
+
+## Quality Gates
+
+- [ ] All tests pass
+- [ ] No new warnings or errors
+- [ ] No TODO/FIXME added without a linked issue
+- [ ] Security rules checked
+- [ ] Code follows naming conventions
 
 ## Related Documentation
 
-- [substrate.md](./substrate.md) - Navigation hub
-- [anti-patterns.md](./anti-patterns.md) - What NOT to do
-- [glossary.md](./glossary.md) - Domain terminology
+- [substrate.md](./substrate.md) -- Navigation hub
+- [anti-patterns.md](./anti-patterns.md) -- What NOT to do
+- [glossary.md](./glossary.md) -- Domain terminology

@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "patterns": {
+    "py": [
+      {
+        "id": "PY001",
+        "regex": "import\\s+os\\s*;\\s*os\\.system\\(",
+        "severity": "error",
+        "message": "Use subprocess instead of os.system() for shell commands."
+      },
+      {
+        "id": "PY002",
+        "regex": "\\.execute\\([^)]*%",
+        "severity": "error",
+        "message": "SQL string interpolation detected. Use parameterized queries."
+      },
+      {
+        "id": "PY003",
+        "regex": "password\\s*=\\s*['\"][^'\"]+['\"]",
+        "severity": "error",
+        "message": "Hardcoded password detected. Use environment variables or secrets manager."
+      },
+      {
+        "id": "PY004",
+        "regex": "# TODO|# FIXME|# HACK",
+        "severity": "warn",
+        "message": "TODO/FIXME/HACK comment. Track in issue tracker instead."
+      }
+    ],
+    "ts": [
+      {
+        "id": "TS001",
+        "regex": "@ts-ignore|@ts-expect-error",
+        "severity": "error",
+        "message": "TypeScript suppression. Fix the type error instead."
+      },
+      {
+        "id": "TS002",
+        "regex": ":\\s*any\\b",
+        "severity": "warn",
+        "message": "Avoid `any` type. Use proper typing or `unknown`."
+      },
+      {
+        "id": "TS003",
+        "regex": "console\\.log\\(",
+        "severity": "warn",
+        "message": "Remove console.log before shipping. Use a proper logger."
+      }
+    ],
+    "js": [
+      {
+        "id": "JS001",
+        "regex": "eval\\(",
+        "severity": "error",
+        "message": "Never use eval(). Security risk."
+      },
+      {
+        "id": "JS002",
+        "regex": "console\\.log\\(",
+        "severity": "warn",
+        "message": "Remove console.log before shipping. Use a proper logger."
+      }
+    ],
+    "go": [
+      {
+        "id": "GO001",
+        "regex": "fmt\\.Print",
+        "severity": "warn",
+        "message": "Use structured logging instead of fmt.Print in production code."
+      },
+      {
+        "id": "GO002",
+        "regex": "interface\\{\\}",
+        "severity": "warn",
+        "message": "Prefer `any` over `interface{}` in Go 1.18+."
+      }
+    ],
+    "xml": [
+    ],
+    "rb": [
+      {
+        "id": "RB001",
+        "regex": "binding\\.pry|byebug",
+        "severity": "error",
+        "message": "Remove debugger statement before shipping."
+      }
+    ]
+  },
+  "failure_logger": {
+    "relevant_commands": ["docker", "pytest", "npm", "yarn", "pnpm", "cargo", "go ", "make", "bundle"],
+    "categories": {
+      "test": ["test", "spec", "pytest", "jest", "vitest", "cargo test"],
+      "build": ["build", "compile", "tsc", "cargo build"],
+      "lint": ["lint", "eslint", "prettier", "rubocop", "clippy", "ruff", "black", "mypy"],
+      "install": ["install", "add ", "npm i", "yarn add", "pip install"]
+    }
+  }
+}

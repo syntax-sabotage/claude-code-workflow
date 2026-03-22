@@ -1,663 +1,436 @@
-# Claude Code Workflow Guide
+# Claude Code Workflow -- Setup Guide
 
-A practical workflow system for Claude Code that scales from single projects to parallel development across multiple codebases. Combines project knowledge documentation (.context system), GitHub-based task management, and multi-project coordination.
+A practical workflow system for Claude Code that combines institutional memory
+(`.context/`), quality enforcement (hooks), multi-agent coordination (workstations),
+and GitHub-native task management (skills).
 
-**Prerequisites:** Familiarity with Claude Code basics, `gh` CLI installed, GitHub repos configured.
+**Prerequisites:** Claude Code installed, `gh` CLI installed and authenticated,
+Git 2.15+.
 
 ---
 
 ## Part 1: The CLAUDE.md Hierarchy
 
-Claude Code reads `CLAUDE.md` files at multiple levels. This creates a cascading context system:
+Claude Code reads `CLAUDE.md` files at multiple levels. This creates cascading
+context -- each level adds specificity:
 
 ```
-~/.claude/CLAUDE.md              # Global - your personal preferences, always loaded
-~/projects/CLAUDE.md             # Directory - shared patterns for project groups
-~/projects/my-app/CLAUDE.md      # Project - specific rules for this codebase
+~/.claude/CLAUDE.md              # Global -- your personal preferences, always loaded
+~/projects/CLAUDE.md             # Directory -- shared patterns for project groups
+~/projects/my-app/CLAUDE.md      # Project -- specific rules for this codebase
+~/projects/my-app-Dev1/CLAUDE.md # Workstation -- role-bound agent instructions
 ```
 
-### Global CLAUDE.md (~/.claude/CLAUDE.md)
+### Level 1: Global (~/.claude/CLAUDE.md)
 
-Your personal AI assistant configuration. Set communication style, reference the .context system:
+Your personal AI configuration. Sets communication style and tells Claude Code
+about the `.context/` system.
 
-```markdown
-## Communication Style
+Copy `templates/CLAUDE.md.global` and customize.
 
-Be direct. No cheerleading phrases. Tell me when my ideas are flawed.
-Use casual language. Focus on practical problems and realistic solutions.
+Key sections:
+- Communication style preferences
+- Instructions to read `.context/substrate.md` on session start
+- Instructions to read `.context/ai-rules.md` before writing code
+- The override principle: .context docs take precedence over generic training
 
-## .context Project Knowledge System
+### Level 2: Directory
 
-When working in any project directory, check for a `.context/` folder. If present:
+Shared conventions for a group of related projects. Sets tech stack standards,
+common mistakes to avoid, and agent role definitions.
 
-### On Session Start
-1. Read `.context/substrate.md` first - it's the navigation hub
-2. For coding tasks, read `.context/ai-rules.md` before writing any code
-3. Check `.context/anti-patterns.md` to avoid known pitfalls
+Copy `templates/CLAUDE.md.directory` and customize.
 
-### When Writing Code
-Always consult before generating code:
-- `.context/ai-rules.md` - Coding standards and constraints
-- `.context/glossary.md` - Project-specific terminology
-- `.context/anti-patterns.md` - Patterns to avoid
+### Level 3: Project
 
-### Key Principle
-The .context folder contains institutional knowledge about WHY decisions were made.
-Prefer patterns documented there over generic best practices.
-If conflict between training and .context docs, follow .context.
-```
+Project-specific rules: framework version compliance, language conventions,
+security requirements, and workflow skills reference.
 
-### Directory-Level CLAUDE.md
+Copy `templates/CLAUDE.md.project` and customize.
 
-Use for shared patterns across similar projects:
+### Level 4: Workstation
 
-```markdown
-# Node.js Projects
+Role-bound instructions for a specific agent. Includes completion standards,
+git safety rules, and scope boundaries.
 
-## Tech Stack Standards
-- Node.js 20+ LTS
-- TypeScript 5.3+ strict mode
-- Vitest for testing
+Copy `templates/CLAUDE.md.workstation` and customize per workstation.
 
-## Common Mistakes to Avoid
-- Missing error handling in async functions
-- Not validating external inputs
-- Hardcoded configuration values
-
-## Projects in This Directory
-- **my-saas/** - Main SaaS platform (Next.js, tRPC, Drizzle, pnpm)
-  - Has `.context/` documentation - read `.context/substrate.md` first
-- **my-mobile/** - iOS companion app (Swift, SwiftUI)
-  - Has `.context/` documentation
-```
-
-### Project CLAUDE.md
-
-Quick-start guide pointing to detailed docs:
-
-```markdown
-# My Project - AI Assistant Context
-
-Multi-tenant SaaS platform. Next.js 15 + Hono + tRPC + Drizzle ORM.
-
-## .context System
-
-Read these files before writing code:
-
-1. .context/substrate.md     → Navigation hub
-2. .context/ai-rules.md      → Hard coding constraints
-3. .context/anti-patterns.md → Patterns to avoid
-
-## GitHub Workflow
-
-| Command | Purpose |
-|---------|---------|
-| `/gh-status` | Overview of issues, PRs, current branch |
-| `/gh-start <issue#>` | Assign issue, create feature branch |
-| `/gh-done` | Push changes, create PR |
-| `/gh-bug` | Create bug report from conversation |
-
-## Quick Commands
-
-```bash
-pnpm dev                  # Start development
-pnpm build                # Build all packages
-pnpm typecheck            # TypeScript check
-pnpm test                 # Run tests
-```
-```
+See [Part 5: Workstations](#part-5-workstations) for full setup.
 
 ---
 
 ## Part 2: The .context Knowledge System
 
-A folder structure for project documentation that Claude Code reads on demand. **Goal:** 80% of value with minimal overhead.
+A folder of structured documentation that Claude Code reads before working.
+This is institutional memory -- it survives context window resets.
 
-### Core Files (Always Create These 5)
+### Core Files
 
 ```
 .context/
-├── substrate.md          # Navigation hub - READ FIRST
-├── ai-rules.md           # Hard coding constraints
-├── anti-patterns.md      # What NOT to do
-├── glossary.md           # Domain terminology
-└── SESSION_HANDOVER.md   # Current state for session continuity
+├── substrate.md                  # Navigation hub -- READ FIRST
+├── ai-rules.md                   # Hard coding constraints
+├── anti-patterns.md              # What NOT to do (with examples)
+├── glossary.md                   # Domain terminology
+├── debt.md                       # Technical debt tracker
+├── handover/                     # Per-workstation session state
+│   ├── dev1.md
+│   └── architect.md
+└── architecture/decisions/       # ADRs -- why decisions were made
+    ├── ADR-TEMPLATE.md
+    └── ADR-001-*.md
 ```
 
-### substrate.md - The Navigation Hub
+### Setup
 
-```markdown
-# Project Substrate
+```bash
+# Copy all templates
+cp -r templates/.context your-project/.context
 
-> One-line description of what this project does.
-
-## Quick Navigation
-
-| Domain | Purpose | Start Here |
-|--------|---------|------------|
-| [Architecture](./architecture/) | System design | overview.md |
-| [Auth](./auth/) | Authentication flow | overview.md |
-| [API](./api/) | Endpoints, procedures | endpoints.md |
-| [Database](./database/) | Schema, models | schema.md |
-
-## Tech Stack
-
-```
-Frontend: Next.js 15, React 19, TypeScript
-Backend:  Hono, tRPC, Drizzle ORM
-Database: PostgreSQL 16
+# Fill in the templates -- replace [PLACEHOLDERS]
+# Start with substrate.md (navigation hub), then ai-rules.md
 ```
 
-## Key Files Reference
+### How Agents Use It
 
-| Purpose | Path |
-|---------|------|
-| Database schema | `packages/database/src/schema/*.ts` |
-| API routes | `apps/api/src/routes/*.ts` |
-| UI components | `apps/web/src/components/*.tsx` |
+| When | Agent Reads |
+|------|------------|
+| Session start | `substrate.md` (overview), handover file (previous state) |
+| Before writing code | `ai-rules.md`, `glossary.md` |
+| Before refactoring | `debt.md`, `anti-patterns.md` |
+| Architecture questions | `architecture/decisions/` |
+| Domain terminology | `glossary.md` |
 
-## Decision History
+### The Override Principle
 
-| Date | Decision | Rationale |
-|------|----------|-----------|
-| 2024-12 | Drizzle over Prisma | Type-safe SQL, faster migrations |
-| 2024-12 | tRPC over REST | End-to-end type safety |
-```
-
-### ai-rules.md - Hard Constraints
-
-Non-negotiable rules Claude must follow:
-
-```markdown
-# AI Rules - Hard Constraints
-
-## TypeScript Standards
-
-```typescript
-// NEVER use @ts-ignore, @ts-expect-error, or any type
-// All function parameters and returns must be typed
-
-// CORRECT: Use workspace aliases
-import { db } from '@myproject/database';
-
-// WRONG: Relative imports across packages
-import { db } from '../../../packages/database/src';
-```
-
-## Database Rules
-
-```typescript
-// EVERY query on tenant data MUST include organizationId filter
-// CORRECT
-.where(
-  and(
-    eq(table.organizationId, ctx.organizationId),
-    eq(table.id, input.id)
-  )
-)
-
-// WRONG: Missing tenant filter = data leak
-.where(eq(table.id, input.id))
-```
-
-## Security Non-Negotiables
-
-1. Never log sensitive data (passwords, tokens, PII)
-2. Never expose internal errors to clients
-3. Always validate file uploads (MIME type AND content)
-4. Always use parameterized queries
-5. Never trust client-side validation alone
-```
-
-### anti-patterns.md - What NOT to Do
-
-Document patterns that caused problems with code examples:
-
-```markdown
-# Anti-Patterns
-
-## Missing Tenant Filter
-
-**Problem**: Data leak across tenants.
-
-```typescript
-// WRONG
-const items = await db.select().from(table).where(eq(table.id, id));
-
-// CORRECT
-const items = await db.select().from(table).where(
-  and(
-    eq(table.organizationId, ctx.organizationId),
-    eq(table.id, id)
-  )
-);
-```
-
-**Why it matters**: One missing filter = data breach.
+If `.context/ai-rules.md` says "use snake_case for variables" but Claude's
+training suggests camelCase, the agent follows `.context/`. This is the single
+most important design principle: project documentation overrides generic training.
 
 ---
 
-## N+1 Query Pattern
+## Part 3: Quality Enforcement Hooks
 
-**Problem**: Performance disaster.
+Hooks are Python scripts that run automatically during Claude Code sessions.
+They enforce quality standards without requiring agent discipline.
 
-```typescript
-// WRONG - N+1 queries
-for (const item of items) {
-  item.children = await db.select()...
+### Setup
+
+```bash
+mkdir -p .claude/hooks
+cp templates/.claude/hooks/*.py .claude/hooks/
+cp templates/.claude/hooks/patterns.json .claude/hooks/
+chmod +x .claude/hooks/*.py
+```
+
+### Hook Reference
+
+| Hook | Trigger | What It Does |
+|------|---------|-------------|
+| `session-debt.py` | PostToolUse (Bash) | Logs errors/warnings to `.flow/session-debt.jsonl` |
+| `check-session-debt.py` | Before shipping | Blocks PR creation if unresolved debt exists |
+| `clear-session-debt.py` | Utility | Clears the debt ledger (called at session start) |
+| `session-context.py` | Session start | Surfaces unreflected learnings, clears previous debt |
+| `failure-logger.py` | PostToolUse (Bash) | Captures failures to `.flow/learnings.jsonl` |
+| `pre-edit-guard.py` | PreToolUse (Edit/Write) | Warns on anti-pattern matches in code edits |
+
+### How Session Debt Works
+
+1. Agent runs a command that produces an error
+2. `session-debt.py` catches it and logs to `.flow/session-debt.jsonl`
+3. Agent continues working (hook never blocks)
+4. When agent tries to ship (`/flow-ship`), `check-session-debt.py` checks the ledger
+5. If unresolved items exist, shipping is blocked
+6. Agent must fix the issues or explicitly justify them
+
+This enforces the **Error Ownership** completion standard: if you caused it,
+you fix it before shipping.
+
+### Customizing Patterns
+
+Edit `patterns.json` to add anti-patterns specific to your framework:
+
+```json
+{
+  "patterns": {
+    "py": [
+      {
+        "id": "PY_CUSTOM",
+        "regex": "your_regex_here",
+        "severity": "warn",
+        "message": "Explanation of why this is bad."
+      }
+    ]
+  }
 }
-
-// CORRECT - Single query with join
-const itemsWithChildren = await db.select()
-  .from(items)
-  .leftJoin(children, eq(items.id, children.itemId));
 ```
+
+Supported file types: `py`, `ts`, `tsx`, `js`, `jsx`, `go`, `rs`, `rb`, `xml`.
+Add more by extending `get_file_type()` in `pre-edit-guard.py`.
 
 ---
 
-## Historical Bugs
+## Part 4: GitHub Workflow with Skills
 
-| Date | Bug | Root Cause | Fix |
-|------|-----|------------|-----|
-| 2024-12-15 | Users saw other users' data | Missing tenant filter | Added organizationId check |
-```
+Skills are slash commands that agents invoke during sessions. They integrate
+Claude Code with GitHub for issue-driven development.
 
-### glossary.md - Domain Terminology
+### Core Skills
 
-Define project-specific terms:
+| Skill | Purpose |
+|-------|---------|
+| `/flow-resume` | Start session -- load handover state, clear previous debt |
+| `/flow-start <#>` | Pick up a GitHub issue, create branch, load context |
+| `/flow-ship` | Check session debt, commit, push, create PR |
+| `/flow-handover` | End session -- save state to handover file |
+| `/flow-status` | Show current work state across workstations |
+| `/flow-reflect` | Synthesize learnings from closed issues into `.context/` |
+| `/flow-refinement <#>` | Deep analysis to make a ticket implementation-ready |
+| `/flow-runner` | Autonomous mode -- picks up eligible issues |
+| `/flow-triage` | Categorize and prioritize open issues |
 
-```markdown
-# Glossary
+### GitHub Labels
 
-## Core Entities
-
-### Organization
-The multi-tenant container. All business data belongs to exactly one organization.
-- Database: `organizations` table
-- Code: `Organization`, `organizationId`
-
-### Member
-A user belonging to an organization with a specific role.
-- Roles: `owner` > `admin` > `member`
-- Database: `organization_members` table
-
-## Technical Terms
-
-### tenantProcedure
-A tRPC procedure requiring auth AND valid organization context via header.
-
-### protectedProcedure
-A tRPC procedure requiring auth but not organization context.
-```
-
-### SESSION_HANDOVER.md - Context Continuity
-
-Capture state between sessions:
-
-```markdown
-# Session Handover
-
-**Last Updated:** 2024-12-20
-
-## Current Focus
-
-Working on issue #47 - User authentication refactor.
-Branch: `47-auth-refactor`
-
-## Recent Changes
-
-- Added OAuth provider support (PR #45)
-- Fixed session timeout bug (PR #46)
-
-## Open Tasks
+Set up labels for your repository (run once):
 
 ```bash
-gh issue list --state open
-```
+# Autonomy levels
+gh label create "autonomy::0" --color "FEF2C0" --description "Supervised"
+gh label create "autonomy::1" --color "FBCA04" --description "Guided"
+gh label create "autonomy::2" --color "0075CA" --description "Autonomous"
+gh label create "autonomy::3" --color "5319E7" --description "Full trust"
 
-- #47 - Auth refactor (in progress)
-- #42 - Performance optimization (blocked)
+# Size
+gh label create "size::xs" --color "E8F5E9"
+gh label create "size::s" --color "BFD4F2"
+gh label create "size::m" --color "7CB3F7"
+gh label create "size::l" --color "1D76DB"
+gh label create "size::xl" --color "0D47A1"
 
-## Blockers
+# Status
+gh label create "status::backlog" --color "EDEDED"
+gh label create "status::ready" --color "0E8A16"
+gh label create "status::active" --color "FBCA04"
+gh label create "status::review" --color "5319E7"
 
-- Waiting on API credentials from client
+# Type
+gh label create "type/bug" --color "D73A4A"
+gh label create "type/feature" --color "0075CA"
+gh label create "type/debt" --color "CFD3D7"
+gh label create "type/security" --color "B60205"
 
-## Notes for Next Session
-
-- OAuth callback URLs need updating for production
-- Run migrations after merging #47
-```
-
-### Optional Domain Folders
-
-Only create these when complexity warrants:
-
-```
-.context/
-├── architecture/
-│   └── overview.md       # System diagrams, patterns
-├── auth/
-│   └── overview.md       # Auth flow, security
-├── database/
-│   └── schema.md         # ERD, migrations
-└── deployment/
-    └── overview.md       # How to ship
-```
-
----
-
-## Part 3: GitHub Workflow with Custom Skills
-
-Custom slash commands that integrate Claude Code with GitHub Issues.
-
-### Setup Labels
-
-Run once per repository:
-
-```bash
-# Priority labels
-gh label create "priority/critical" --color "B60205" --description "Production down or security issue"
-gh label create "priority/high" --color "D93F0B" --description "Blocking or major functionality"
-gh label create "priority/medium" --color "FBCA04" --description "Important but not urgent"
-gh label create "priority/low" --color "0E8A16" --description "Nice to have"
-
-# Type labels
-gh label create "type/bug" --color "D73A4A" --description "Something isn't working"
-gh label create "type/feature" --color "0075CA" --description "New functionality"
-gh label create "type/debt" --color "CFD3D7" --description "Technical debt"
-gh label create "type/security" --color "B60205" --description "Security issue"
-
-# Status labels
-gh label create "status/blocked" --color "FEF2C0" --description "Waiting on external dependency"
-gh label create "status/review" --color "5319E7" --description "Ready for review"
-```
-
-### Create Custom Skills
-
-Create `.claude/commands/` in your project:
-
-**.claude/commands/gh-status.md:**
-```markdown
----
-description: GitHub Status Overview
----
-
-Show me the current state of work:
-
-1. Run `gh issue list --state open --label "priority/critical,priority/high" --limit 10`
-2. Run `gh issue list --state open --assignee @me`
-3. Run `git branch --show-current` and check if branch name contains issue number
-4. Run `gh pr list --state open --limit 5`
-
-Present a summary:
-- What needs urgent attention
-- What I'm currently working on
-- What's ready for review
-```
-
-**.claude/commands/gh-start.md:**
-```markdown
----
-description: Start Work on GitHub Issue
----
-
-Start work on issue #$ARGUMENTS:
-
-1. Run `gh issue view $ARGUMENTS` to see issue details
-2. Run `gh issue edit $ARGUMENTS --add-assignee @me` to assign yourself
-3. Create branch: `git checkout -b $ARGUMENTS-<short-slug-from-title>`
-4. Report back with issue summary and branch name
-```
-
-**.claude/commands/gh-done.md:**
-```markdown
----
-description: Finish Work and Create PR
----
-
-Finish current work and create a PR:
-
-1. Run `git branch --show-current` to get branch name
-2. Extract issue number from branch name (e.g., "6-fix-bug" -> 6)
-3. Run `git status` - if uncommitted changes, ask what to do
-4. Run `git log origin/main..HEAD` - if unpushed commits, push them
-5. Create PR: `gh pr create --title "<descriptive title>" --body "Fixes #<issue-number>"`
-6. Report back with PR URL
-```
-
-**.claude/commands/gh-bug.md:**
-```markdown
----
-description: Quick Bug Report
----
-
-Create a bug report from our conversation:
-
-1. Gather context: What bug did we discuss? Expected vs actual behavior?
-2. Determine priority (critical/high/medium/low)
-3. Create issue:
-   ```
-   gh issue create \
-     --title "<concise bug title>" \
-     --body "<description with steps to reproduce>" \
-     --label "type/bug,priority/<level>"
-   ```
-4. Report back with issue URL and number
+# Role assignment
+gh label create "role::developer" --color "0075CA"
+gh label create "role::architect" --color "5319E7"
+gh label create "role::reviewer" --color "FBCA04"
 ```
 
 ### The Workflow
 
-```bash
-# See what needs attention
-/gh-status
-
-# Start work on an issue
-/gh-start 12
-# Claude: assigns issue, creates branch 12-add-user-auth
-
-# ... do the work ...
-
-# Create PR when done
-/gh-done
-# Claude: pushes, creates PR linked to issue #12
-
-# After review, merge
-gh pr merge --squash --delete-branch
-
-# Deploy (customize for your setup)
-ssh server "cd /app && git pull && docker compose up -d"
+```
+/flow-resume                  # Load context from last session
+/flow-start 42                # Pick up issue #42, create branch
+  ... implement ...           # Agent works on the issue
+/flow-ship                    # Session debt check -> commit -> PR
+/flow-handover                # Save state for next session
 ```
 
 ---
 
-## Part 4: Parallel Project Development
+## Part 5: Workstations
 
-Working on multiple projects simultaneously (e.g., SaaS backend + mobile app).
+Workstations are persistent git worktrees, each bound to a specific agent role.
+This is optional -- start without workstations and add them when you need
+parallel agents.
 
-### Terminal Setup
+### When to Use Workstations
 
-Run multiple Claude Code instances:
+- You want multiple agents working simultaneously
+- You need clean context separation between roles
+- Your project is large enough that a single agent can't hold all context
 
-```
-┌────────────────────┬────────────────────┐
-│  Terminal 1        │  Terminal 2        │
-│  ~/projects/saas   │  ~/projects/mobile │
-│  claude            │  claude            │
-└────────────────────┴────────────────────┘
-```
+### Quick Setup
 
-Each instance loads its own CLAUDE.md hierarchy and .context.
-
-### Cross-Project Issue Flow
-
-When work in one project creates tasks for another:
-
-**In SaaS terminal:**
-```
-> The mobile app will need a new /api/v2/sync endpoint for offline support.
-> /gh-bug
-# Claude creates issue in current repo
-```
-
-**Then in mobile terminal:**
-```
-> We need to implement offline sync. The backend team created issue saas-repo#47
-> for the API endpoint. Create a linked issue here for the mobile implementation.
-```
-
-**Or reference across repos:**
 ```bash
-# Create issue referencing another repo
-gh issue create \
-  --title "Implement offline sync" \
-  --body "Depends on org/saas-repo#47 for API endpoint" \
-  --label "type/feature,priority/high"
+# Create workstation branches
+git checkout -b dev1 && git push -u origin dev1 && git checkout main
+git checkout -b reviewer && git push -u origin reviewer && git checkout main
+
+# Create worktrees
+git worktree add ../your-project-Dev1 dev1
+git worktree add ../your-project-Reviewer reviewer
+
+# Set up role-bound CLAUDE.md in each
+# (customize from templates/CLAUDE.md.workstation)
+
+# Protect CLAUDE.md from merge overwrites
+echo "CLAUDE.md merge=ours" >> .gitattributes
+git config merge.ours.driver true
 ```
 
-### Shared Documentation Patterns
-
-For related projects, consider:
-
-```
-projects/
-├── CLAUDE.md                    # Shared conventions
-├── saas/
-│   ├── CLAUDE.md               # SaaS-specific
-│   └── .context/
-└── mobile/
-    ├── CLAUDE.md               # Mobile-specific
-    └── .context/
-```
-
-The parent CLAUDE.md can document shared API contracts, data models, etc.
-
-### Session Handover Across Projects
-
-Update SESSION_HANDOVER.md with cross-project notes:
-
-```markdown
-## Cross-Project Dependencies
-
-- Mobile app waiting on saas#47 (sync API endpoint)
-- Created mobile#23 to track implementation
-- Shared data model changes need coordination
-```
+See [docs/WORKSTATIONS.md](docs/WORKSTATIONS.md) for the full guide.
 
 ---
 
-## Part 5: Onboarding Existing Projects
+## Part 6: Completion Standards
 
-### Quick Setup (5 minutes)
+Non-negotiable rules enforced on every workstation. These exist because AI agents
+have systematic biases toward declaring work complete prematurely.
 
-1. Create `.context/` folder
-2. Add the 5 core files (substrate, ai-rules, anti-patterns, glossary, session-handover)
-3. Create `.claude/commands/` with the 4 GitHub skills
-4. Update project CLAUDE.md to reference .context
+### Error Ownership
+
+If you caused it during this session, you fix it. No "that's unrelated" excuses.
+
+### Anti-Deferral
+
+If it's in the acceptance criteria, do it now. "Too much work" is not a valid
+deferral reason. Flag scope concerns BEFORE starting, not after.
+
+### Definition of Done
+
+All AC items checked, no new errors, no bare TODOs, session debt clean,
+CHANGELOG updated, self-review completed.
+
+### Self-Review
+
+Re-read the original issue before shipping. Compare what was requested against
+what was implemented. Report gaps explicitly.
+
+See [examples/completion-standards.md](examples/completion-standards.md) for the
+full reference.
+
+---
+
+## Part 7: Onboarding an Existing Project
+
+### Quick Start (15 minutes)
+
+1. **Copy templates:**
+   ```bash
+   cp -r templates/.context your-project/.context
+   cp -r templates/.claude your-project/.claude
+   cp -r templates/.flow your-project/.flow
+   cp templates/CLAUDE.md.project your-project/CLAUDE.md
+   ```
+
+2. **Fill in substrate.md** -- your project overview, modules, tech stack
+
+3. **Fill in ai-rules.md** -- your coding standards and conventions
+
+4. **Fill in glossary.md** -- your domain terms (at least core entities)
+
+5. **Customize patterns.json** -- add anti-patterns for your framework
+
+6. **Start using it:**
+   ```bash
+   cd your-project
+   claude
+   # Agent reads .context/substrate.md, loads rules, starts working
+   ```
 
 ### Extract Knowledge from Existing Codebase
 
-Run these prompts in Claude Code:
+Use Claude Code to analyze your project and populate `.context/`:
 
-**Step 1: Analyze**
 ```
-Analyze this codebase:
-1. Tech stack (check package.json, etc.)
-2. Directory structure
-3. Key entry points
-4. Database/ORM setup
-5. Auth approach
-
-Give me a summary, not a wall of text.
+Analyze this codebase: tech stack, directory structure, key entry points,
+database setup, auth approach. Give me a summary.
 ```
 
-**Step 2: Find Anti-patterns**
 ```
-Search for signs of technical debt:
-1. TODO/FIXME/HACK comments
-2. Overly complex functions (100+ lines)
-3. Inconsistent patterns
-4. Hardcoded values
-
-List with file:line references.
+Search for technical debt: TODO/FIXME/HACK comments, complex functions,
+inconsistent patterns, hardcoded values. List with file references.
 ```
 
-**Step 3: Extract Domain Terms**
 ```
-Extract domain terminology:
-1. Model/entity definitions - what are core business objects?
-2. Enum definitions - what states/types exist?
-3. Service class names - what operations matter?
-
+Extract domain terminology: model definitions, enum types, service classes.
 Create a glossary with Term, Definition, Where Used.
-```
-
-**Step 4: Generate .context**
-```
-Based on our analysis, create the .context/ folder with:
-1. substrate.md - project overview
-2. ai-rules.md - based on existing patterns (not idealized)
-3. glossary.md - terms we extracted
-4. anti-patterns.md - problems we found
-5. SESSION_HANDOVER.md - current state
 ```
 
 ---
 
-## Part 6: Maintenance
+## Part 8: Estimation for Human+AI Teams
 
-### After Each Session
+Traditional estimation (story points, developer days) doesn't work for human+AI
+teams. Agent coding speed is not the bottleneck -- human attention is.
 
-Update SESSION_HANDOVER.md:
-- What changed
-- What's still open
-- Any blockers
+### Three Units
 
-### When You Hit a Bug
+| Unit | What It Measures |
+|------|-----------------|
+| **Session** | One focused human+agent block (1-3 hours of human time) |
+| **Agent-slot** | One agent working independently (parallelizable) |
+| **Gate** | A human decision/review point |
 
-Add to anti-patterns.md Historical Bugs:
+### Autonomy Reduces Gates
 
-```markdown
-| Date | Bug | Root Cause | Fix |
-|------|-----|------------|-----|
-| 2024-12-20 | Data leak | Missing tenant filter | Added org check |
-```
+| Level | Gates | Human Time |
+|-------|-------|-----------|
+| `autonomy::0` | Many | ~1 hour/ticket |
+| `autonomy::1` | 2 (approve approach + review PR) | ~20-30 min |
+| `autonomy::2` | 1 (review PR only) | ~10 min |
+| `autonomy::3` | 0 (agent ships, human merges) | ~2 min |
 
-### When Patterns Emerge
+Promoting tickets from `autonomy::1` to `autonomy::2` via thorough refinement
+doubles the human's effective throughput. Refinement is the highest-leverage
+activity.
 
-If you see the same mistake 3 times, add it to anti-patterns.md with:
-- BAD code example
-- GOOD code example
-- Why it matters
-
-### Periodic Review
-
-Monthly: Review .context files for accuracy. Remove outdated info.
+See `templates/.context/architecture/decisions/ADR-002-agentic-estimation-model.md`
+for the full framework.
 
 ---
 
 ## Quick Reference
 
-See [README.md](README.md) for the complete file reference table, slash command list, and FLOW commands.
+### File Structure
 
-### Typical Workflow
+```
+your-project/
+├── CLAUDE.md                     # Project-level AI context
+├── .gitattributes                # Merge protection for CLAUDE.md
+├── .context/                     # Institutional memory
+│   ├── substrate.md              # Navigation hub
+│   ├── ai-rules.md              # Coding constraints
+│   ├── anti-patterns.md         # What not to do
+│   ├── glossary.md              # Domain terminology
+│   ├── debt.md                  # Tech debt tracker
+│   ├── handover/                # Per-workstation state
+│   └── architecture/decisions/  # ADRs
+├── .claude/
+│   └── hooks/                   # Quality enforcement
+│       ├── session-debt.py
+│       ├── check-session-debt.py
+│       ├── clear-session-debt.py
+│       ├── session-context.py
+│       ├── failure-logger.py
+│       ├── pre-edit-guard.py
+│       └── patterns.json
+└── .flow/
+    ├── state.json               # Cross-workstation state (gitignored)
+    └── .gitignore
+```
+
+### Typical Session
 
 ```bash
-/gh-status              # What needs attention?
-/gh-start 12            # Start issue #12
+cd your-project-Dev1
+claude
+# /flow-resume         -> loads context
+# /flow-start 42       -> picks up issue
 # ... work ...
-/gh-done                # Create PR
-gh pr merge --squash --delete-branch
-# Deploy
+# /flow-ship           -> debt check, commit, PR
+# /flow-handover       -> saves state
 ```
 
 ---
 
 ## TL;DR
 
-1. **CLAUDE.md hierarchy** - Global prefs → Directory patterns → Project specifics
-2. **.context folder** - 5 core files documenting WHY, not just WHAT
-3. **GitHub skills** - 4 custom commands for issue-driven development
-4. **Parallel work** - Multiple terminals, cross-reference issues
-5. **Maintenance** - Update SESSION_HANDOVER.md, log bugs to anti-patterns
+1. **CLAUDE.md hierarchy** -- Global -> Directory -> Project -> Workstation
+2. **.context system** -- Institutional memory that survives context resets
+3. **Hooks** -- Automated quality enforcement (session debt, anti-patterns)
+4. **Skills** -- Slash commands for GitHub-native workflow
+5. **Workstations** -- Named git worktrees per agent role (optional)
+6. **Completion standards** -- Error ownership, anti-deferral, self-review
 
-Start minimal. Add documentation as patterns emerge. Don't over-engineer.
+Start with `.context/` and hooks. Add workstations when you need parallel agents.

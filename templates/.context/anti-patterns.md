@@ -1,204 +1,117 @@
-# Anti-Patterns - What NOT to Do
+# Anti-Patterns -- What NOT to Do
 
-Patterns that have caused problems. Avoid these.
-
-## Database Anti-Patterns
-
-### Missing Tenant Filter (if multi-tenant)
-
-**Problem**: Data leak across tenants.
-
-```typescript
-// WRONG - Data leak vulnerability
-const items = await db
-  .select()
-  .from(itemsTable)
-  .where(eq(itemsTable.id, itemId));
-
-// CORRECT - Always include tenant filter
-const items = await db
-  .select()
-  .from(itemsTable)
-  .where(
-    and(
-      eq(itemsTable.organizationId, ctx.organizationId),
-      eq(itemsTable.id, itemId)
-    )
-  );
-```
-
-**Why it matters**: One missing filter = data breach.
+Patterns that have caused problems. Learn from past mistakes.
 
 ---
 
-### N+1 Query Pattern
+## Hardcoded Credentials
 
-**Problem**: Fetching related data in a loop.
+**Problem**: Secrets in source code get committed to version control.
 
-```typescript
-// WRONG - N+1 queries
-const items = await db.select().from(itemsTable);
-for (const item of items) {
-  item.children = await db.select().from(childTable).where(...);
-}
+```python
+# WRONG -- credentials in code
+API_KEY = "sk-abc123secret"
+db_password = "hunter2"
 
-// CORRECT - Single query with join
-const itemsWithChildren = await db
-  .select()
-  .from(itemsTable)
-  .leftJoin(childTable, eq(itemsTable.id, childTable.itemId));
+# CORRECT -- environment variables
+API_KEY = os.environ["API_KEY"]
+db_password = os.environ["DATABASE_PASSWORD"]
 ```
+
+**Why it matters**: Once a secret is in git history, it's compromised. Rotating credentials is expensive and easy to forget.
+
+**Detection**: `pre-edit-guard.py` pattern PY003 catches hardcoded passwords.
 
 ---
 
-### Raw SQL String Interpolation
+## Bare External Imports Without Error Handling
 
-**Problem**: SQL injection.
+**Problem**: External dependencies fail at runtime with cryptic errors.
 
-```typescript
-// WRONG - SQL injection
-const result = await db.execute(
-  `SELECT * FROM items WHERE name = '${userInput}'`
-);
+```python
+# WRONG -- bare import, crashes if not installed
+from special_library import magic_function
 
-// CORRECT - Parameterized via ORM
-const result = await db
-  .select()
-  .from(itemsTable)
-  .where(eq(itemsTable.name, userInput));
+# CORRECT -- graceful degradation
+try:
+    from special_library import magic_function
+    HAS_SPECIAL_LIBRARY = True
+except ImportError:
+    HAS_SPECIAL_LIBRARY = False
+    magic_function = None
 ```
 
----
+```javascript
+// WRONG -- unhandled external call
+const data = await fetch(EXTERNAL_API_URL);
+const json = await data.json();
 
-## API Anti-Patterns
-
-### Exposing Internal Errors
-
-**Problem**: Stack traces leak implementation details.
-
-```typescript
-// WRONG
-catch (error) {
-  throw new Error(error.message); // SQL errors, paths, etc.
-}
-
-// CORRECT
-catch (error) {
-  logger.error({ error }, 'Operation failed');
-  throw new AppError({
-    code: 'INTERNAL_ERROR',
-    message: 'Operation failed. Please try again.',
-  });
+// CORRECT -- handle failures
+try {
+    const data = await fetch(EXTERNAL_API_URL);
+    if (!data.ok) throw new Error(`API returned ${data.status}`);
+    const json = await data.json();
+} catch (error) {
+    logger.error({ error }, 'External API call failed');
+    throw new AppError({ code: 'EXTERNAL_SERVICE_UNAVAILABLE' });
 }
 ```
 
+**Why it matters**: External dependencies are the most common source of production incidents. Always handle their absence or failure.
+
 ---
 
-### Unbounded List Queries
+## Reinventing Framework Patterns
 
-**Problem**: Memory exhaustion, slow responses.
+**Problem**: Writing custom implementations for things the framework already provides.
 
-```typescript
-// WRONG - No limit
-const items = await db.select().from(itemsTable);
+```python
+# WRONG -- custom date formatting
+def format_date(dt):
+    return f"{dt.year}-{dt.month:02d}-{dt.day:02d}"
 
-// CORRECT - Always paginate
-const items = await db
-  .select()
-  .from(itemsTable)
-  .limit(input.limit ?? 50)
-  .offset(input.offset ?? 0);
+# CORRECT -- use the framework/stdlib
+formatted = dt.strftime("%Y-%m-%d")
+# Or: dt.isoformat() for ISO 8601
 ```
 
----
-
-### Missing Input Validation
-
-**Problem**: Invalid data corrupts database.
-
-```typescript
-// WRONG - Trusting input
-export const updateItem = procedure
-  .mutation(async ({ input }) => {
-    await db.update(itemsTable).set(input).where(...);
-  });
-
-// CORRECT - Validate everything
-export const updateItem = procedure
-  .input(updateItemSchema)
-  .mutation(async ({ input }) => {
-    await db.update(itemsTable).set(input).where(...);
-  });
-```
-
----
-
-## Frontend Anti-Patterns
-
-### Missing Loading States
-
-**Problem**: Users don't know if action worked.
-
-```tsx
-// WRONG - No feedback
-<Button onClick={() => mutation.mutate(data)}>Save</Button>
-
-// CORRECT - Loading and error states
-<Button
-  disabled={mutation.isPending}
-  onClick={() => mutation.mutate(data)}
->
-  {mutation.isPending ? 'Saving...' : 'Save'}
-</Button>
-```
-
----
-
-### Stale Cache After Mutations
-
-**Problem**: UI shows outdated data.
-
-```typescript
-// WRONG - Mutation without invalidation
-const mutation = useMutation({ mutationFn: createItem });
-
-// CORRECT - Invalidate related queries
-const mutation = useMutation({
-  mutationFn: createItem,
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['items'] });
-  },
-});
-```
-
----
-
-## File Upload Anti-Patterns
-
-### Trusting File Extension
-
-**Problem**: Malicious files can be renamed.
-
-```typescript
-// WRONG - Trust extension
-if (file.name.endsWith('.jpg')) { ... }
-
-// CORRECT - Check MIME type AND magic bytes
-const type = await fileTypeFromBuffer(buffer);
-if (!ALLOWED_TYPES.includes(type?.mime)) {
-  throw new Error('Invalid file type');
+```javascript
+// WRONG -- custom deep clone
+function deepClone(obj) {
+    return JSON.parse(JSON.stringify(obj));
 }
+
+// CORRECT -- use structuredClone (available since Node 17, all modern browsers)
+const clone = structuredClone(obj);
 ```
+
+**Why it matters**: Custom implementations have bugs the framework has already fixed. They also confuse other developers who expect standard patterns.
+
+---
+
+## Missing Tenant/Scope Filter on Queries
+
+**Problem**: Data leaks between users, organizations, or tenants.
+
+```sql
+-- WRONG -- no scope filter
+SELECT * FROM documents WHERE id = $1;
+
+-- CORRECT -- always scope to the current tenant/user
+SELECT * FROM documents WHERE id = $1 AND organization_id = $2;
+```
+
+**Why it matters**: A single missing filter is a data breach. This is the most common security vulnerability in multi-tenant applications.
 
 ---
 
 ## Historical Bugs
 
-Document bugs that made it to production:
+Track bugs that made it to production so the team learns from them.
 
 | Date | Bug | Root Cause | Fix |
 |------|-----|------------|-----|
-| <!-- Date --> | <!-- What happened --> | <!-- Why --> | <!-- How fixed --> |
+| <!-- YYYY-MM-DD --> | <!-- What happened --> | <!-- Why --> | <!-- How fixed --> |
 
 ---
 
@@ -206,14 +119,12 @@ Document bugs that made it to production:
 
 | Anti-Pattern | Risk Level | Detection |
 |--------------|------------|-----------|
-| Missing tenant filter | Critical | Code review |
-| SQL injection | Critical | Static analysis |
-| Exposed internal errors | High | Log monitoring |
-| Unbounded queries | High | Performance testing |
-| Missing loading states | Medium | UX review |
-| Stale cache | Medium | Integration testing |
+| Hardcoded credentials | Critical | pre-edit-guard, code review |
+| Bare external imports | High | Code review, integration tests |
+| Reinventing framework | Medium | Code review |
+| Missing scope filter | Critical | Code review, integration tests |
 
 ## Related Documentation
 
-- [ai-rules.md](./ai-rules.md) - Coding constraints
-- [substrate.md](./substrate.md) - Navigation hub
+- [ai-rules.md](./ai-rules.md) -- Coding constraints
+- [substrate.md](./substrate.md) -- Navigation hub

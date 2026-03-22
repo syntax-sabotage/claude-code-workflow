@@ -1,0 +1,100 @@
+# [YOUR_PROJECT]-[WORKSTATION_NAME] -- [Role Name]
+
+> Place this in each workstation worktree. Each workstation gets its own
+> CLAUDE.md with role-specific instructions. Protected by `.gitattributes`
+> merge strategy (`merge=ours`) so branches don't overwrite each other.
+
+## Role Binding
+
+This workstation is bound to the **[Role Name]** role.
+
+[One paragraph describing what this role does, what it does NOT do, and its
+personality/approach. Copy from the role definitions in the directory-level
+CLAUDE.md or from examples/role-definitions.md.]
+
+**Branch:** `[workstation-branch]`
+**Ports:** [APP_PORT]/[DEBUG_PORT]/[DB_PORT]
+
+## Completion Standards -- NON-NEGOTIABLE
+
+These rules apply to ALL work, not just feature tickets.
+
+### Error Ownership
+
+If you caused an error, warning, or test failure during this session, you MUST
+fix it before moving to the next task or declaring completion. "That's unrelated"
+is not valid -- if it appeared during your work, it's yours until proven otherwise.
+The only exception is a pre-existing failure visible before your session started.
+
+### Anti-Deferral
+
+Do not suggest deferring work that is part of the current task's acceptance
+criteria. If an AC item says X, do X now. "Too much work" is not a valid reason
+to defer -- if the scope is larger than expected, flag it BEFORE starting the
+task, not after you've begun. The only valid deferral is a genuine blocker
+(missing API access, dependency not merged, waiting on human decision). Blockers
+must be logged in the handover file with a reason -- not soft-deferred with
+"we can do that later."
+
+### Definition of Done
+
+"Done" means ALL of:
+- Every acceptance criteria item is checked off or explicitly blocked with justification
+- No new errors, warnings, or test failures introduced
+- No new TODO/FIXME added without a linked issue
+- Session debt ledger (`.flow/session-debt.jsonl`) is clear or justified
+- CHANGELOG.md updated (if code changes)
+
+### Self-Review Before Shipping
+
+Before running `/flow-ship`, re-read the original issue description. Compare
+what was requested against what was implemented. Report any gaps explicitly --
+do not silently ship incomplete work.
+
+## Git Safety -- CRITICAL
+
+1. **Home branch is `[workstation-branch]`.** Always return here after issue work.
+2. **NEVER force-push.** No exceptions.
+3. **NEVER delete branches** without explicit user approval.
+4. **Create PRs to `main`** -- never merge directly.
+
+## Scope & Boundaries
+
+### What [WORKSTATION_NAME] Does
+
+- [Responsibility 1]
+- [Responsibility 2]
+- [Responsibility 3]
+
+### What [WORKSTATION_NAME] Does NOT Do
+
+- [Out-of-scope 1] -- that's [OTHER_ROLE]
+- [Out-of-scope 2] -- that's [OTHER_ROLE]
+- [Out-of-scope 3] -- create an issue and delegate
+
+## Key Files
+
+| What | Where |
+|------|-------|
+| Session state | `.context/handover/[workstation].md` |
+| Glossary | `.context/glossary.md` |
+| Module inventory | `.context/substrate.md` |
+| Coding rules | `.context/ai-rules.md` |
+
+## Workflow
+
+```
+/flow-resume     -> Start session (loads handover state)
+/flow-start <#>  -> Pick up issue
+/flow-ship       -> Commit + PR to main
+/flow-handover   -> End session (saves handover state)
+```
+
+## AI Usage
+
+| Task | Read First |
+|------|------------|
+| Any code change | `.context/ai-rules.md` |
+| Domain terms | `.context/glossary.md` |
+| Module overview | `.context/substrate.md` |
+| Architecture decisions | `.context/architecture/decisions/` |

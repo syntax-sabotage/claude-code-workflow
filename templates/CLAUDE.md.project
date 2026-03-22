@@ -1,0 +1,74 @@
+# [YOUR_PROJECT] -- AI Assistant Context
+
+> Place this at the project root. It provides project-specific rules
+> that override directory-level conventions where needed.
+
+## Version Compliance
+
+- Target: [YOUR_FRAMEWORK] [VERSION]
+- [Framework-specific version rules, e.g., deprecated APIs to avoid]
+- [Required patterns for this version]
+
+## Language Rules
+
+| Context | Language | Notes |
+|---------|----------|-------|
+| User-facing content | [YOUR_UI_LANGUAGE] | [Conventions, e.g., inclusive language] |
+| Code, comments, XML IDs | English | Always |
+| Commit messages, docs | English | Always |
+
+## Security
+
+- Every new model requires access control configuration
+- Row-level security for portal/public access
+- `copy=False` (or equivalent) on tokens, UUIDs, credentials
+- Input validation on all external-facing endpoints
+
+## Quality
+
+- ALWAYS verify work after implementation -- testing is critical
+- ONE feature per session; use `/clear` when starting a new feature
+- Start complex tasks in Plan mode (Shift+Tab)
+- Use framework ORM -- never raw SQL unless absolutely necessary
+
+## .context System
+
+Read these files before writing code:
+
+1. `.context/substrate.md` -- Navigation hub
+2. `.context/ai-rules.md` -- Hard coding constraints
+3. `.context/glossary.md` -- Domain terminology
+
+## Workflow
+
+| Skill | Purpose |
+|-------|---------|
+| `/flow-resume` | Start session, restore context |
+| `/flow-start <#>` | Pick up issue, create branch |
+| `/flow-ship` | Commit, push, create PR |
+| `/flow-handover` | End session, save state |
+| `/flow-status` | Show current work state |
+| `/flow-reflect` | Synthesize learnings |
+
+## Quick Commands
+
+```bash
+# Development
+[YOUR_DEV_COMMAND]
+
+# Testing
+[YOUR_TEST_COMMAND]
+
+# Build
+[YOUR_BUILD_COMMAND]
+
+# Lint
+[YOUR_LINT_COMMAND]
+```
+
+## Module Source of Truth
+
+| Module | Location | Notes |
+|--------|----------|-------|
+| [module-1] | `[path]` | [Brief description] |
+| [module-2] | `[path]` | [Brief description] |

@@ -1,0 +1,76 @@
+# [YOUR_DIRECTORY] -- Shared Project Standards
+
+> Place this at the parent directory containing related projects.
+> It sets shared conventions that apply to all projects in this directory.
+
+## Tech Stack Standards
+
+- [YOUR_FRAMEWORK] [VERSION]+
+- [YOUR_LANGUAGE] [VERSION]+ [mode, e.g., strict]
+- [YOUR_TEST_RUNNER] for testing
+- [YOUR_PACKAGE_MANAGER] for dependencies
+
+## Common Mistakes to Avoid
+
+- [Mistake 1: e.g., Missing error handling in async functions]
+- [Mistake 2: e.g., Not validating external inputs]
+- [Mistake 3: e.g., Hardcoded configuration values]
+
+## Shared Conventions
+
+### Security
+- Every new model/table requires access control rules
+- Record/row-level security for multi-tenant or portal access
+- `copy=False` (or equivalent immutability) on tokens, UUIDs, credentials
+
+### Quality
+- ALWAYS verify work after implementation -- testing is critical
+- ONE feature per session; use `/clear` when starting a new feature
+- Start complex tasks in Plan mode
+- Use framework ORM/query builders -- never raw SQL unless absolutely necessary
+
+### Documentation
+- Update CHANGELOG.md when implementing features
+- Docstrings/JSDoc only on complex business logic
+- README.md for module/package overview and setup
+
+## Agent Roles
+
+Portable role definitions. Projects bind workstations to these roles.
+
+### Architect
+Designs systems, writes ADRs, triages and refines issues, plans implementation
+strategies, maintains `.context/` health, manages streams and milestones.
+Does NOT: implement features, review PRs, write data scripts.
+Strategic, opinionated, direct.
+
+### Developer
+Implements tickets from refined issues. Ships code via `/flow-start` -> `/flow-ship`.
+Follows existing architecture and ADRs. Escalates design questions to Architect.
+Does NOT: make architecture decisions, merge without review, write data scripts.
+Practical, test-driven, focused.
+
+### Reviewer
+Reviews pull/merge requests for correctness, test coverage, architecture compliance.
+Applies advisory labels. Validates that PRs match their linked issues.
+Does NOT: implement fixes found during review, make architecture decisions.
+Thorough, detail-oriented, constructive.
+
+### Data Engineer
+Writes data scripts: enrichment, bootstrap, reconciliation, migration, audit.
+Every write has dry-run mode. Every mutation is logged.
+Does NOT: write application code, make architecture decisions, review PRs.
+Methodical, cautious, audit-obsessed.
+
+### Content Engineer
+Captures UI workflows, generates training content, publishes documentation.
+Maintains scenario library. Validates content against current application state.
+Does NOT: write application code, make architecture decisions, review PRs.
+Methodical about capture quality, obsessive about accuracy.
+
+## Project Index
+
+| Project | CLAUDE.md | Notes |
+|---------|-----------|-------|
+| [project-1] | `[project-1]/CLAUDE.md` | [Brief description] |
+| [project-2] | `[project-2]/CLAUDE.md` | [Brief description] |
